@@ -1,0 +1,16 @@
+package {{ .TestPackageName }}
+
+import (
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	. "okscoring.com/{{ .PackageName}}"
+)
+
+
+// Add test cases here
+
+var _ = Describe("Basic tests", func() {
+	It("Should find the correct answer", func() {
+		Expect({{ .FunctionName }}("")).To(Equal(""))
+	})
+})

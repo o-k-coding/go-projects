@@ -1,0 +1,9 @@
+curl https://api.github.com # get request to GH api
+
+###
+
+curl http://localhost:8080 -v
+
+###
+
+

@@ -1,0 +1,12 @@
+package {{ .TestPackageName }}
+
+import (
+    . "github.com/onsi/ginkgo"
+    . "github.com/onsi/gomega"
+    "testing"
+)
+
+func Test{{.FunctionName }}(t *testing.T) {
+    RegisterFailHandler(Fail)
+    RunSpecs(t, "{{.PackageName }} Suite")
+}
