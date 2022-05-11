@@ -6,11 +6,9 @@ func SearchRange(nums []int, target int) []int {
 		if num == target {
 			if result[0] == -1 {
 				result[0] = i
-				result[1] = i
-			} else {
-				result[1] = i
 			}
-		} else if result[0] != -1 && result[1] != -1 {
+			result[1] = i
+		} else if num > target {
 			break
 		}
 	}

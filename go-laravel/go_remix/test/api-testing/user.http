@@ -1,0 +1,15 @@
+curl -X POST http://localhost:4000/user
+
+######
+
+curl -X GET http://localhost:4000/users
+
+
+######
+
+curl -X GET http://localhost:4000/user/1
+
+
+######
+
+curl -X PUT http://localhost:4000/user/1

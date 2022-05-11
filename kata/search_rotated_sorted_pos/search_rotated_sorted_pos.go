@@ -7,6 +7,7 @@ func SearchRotatedSortedPos(nums []int, target int) int {
 	modifier := 1
 	i := 0
 	end := len(nums)
+	// If the target is less than the first value, loop starting from the end of the slice
 	if (target < nums[0]) {
 		modifier = -1
 		i = len(nums) - 1
@@ -22,8 +23,7 @@ func SearchRotatedSortedPos(nums []int, target int) int {
 		} else if (modifier == 1 && nums[i] > target) {
 			break
 		}
-		i += 1 * modifier
+		i += modifier
 	}
-
 	return -1
 }
