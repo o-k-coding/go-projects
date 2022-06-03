@@ -7,6 +7,7 @@ import (
 	"github.com/okeefem2/celeritas"
 	"github.com/okeefem2/go_remix/data"
 	"github.com/okeefem2/go_remix/handlers"
+	"github.com/okeefem2/go_remix/middleware"
 )
 
 func initApplication() *application {
@@ -30,12 +31,18 @@ func initApplication() *application {
 		App: cel,
 	}
 
+	appMiddleware := &middleware.Middleware{
+		App: cel,
+	}
+
 	app := &application{
 		App:      cel,
 		Handlers: appHandlers,
+		Middleware: appMiddleware,
 	}
 
 	app.Models = data.New(app.App.DB.Pool)
+	app.Handlers.Models = app.Models // This feels weird to me btw.
 	app.App.Routes = app.routes()
 
 	return app

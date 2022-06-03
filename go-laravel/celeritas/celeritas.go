@@ -103,7 +103,7 @@ func (c *Celeritas) New(rootPath string) error {
 		}
 		c.DB = Database{
 			DataType: dbType,
-			Pool: db,
+			Pool:     db,
 		}
 	}
 
@@ -157,6 +157,7 @@ func (c *Celeritas) New(rootPath string) error {
 		RootPath: c.RootPath,
 		Port:     os.Getenv("PORT"),
 		JetViews: c.JetViews,
+		Session: c.Session,
 	}
 
 	return nil
@@ -220,20 +221,20 @@ func (c *Celeritas) buildDSN() string {
 	var dsn string
 
 	switch strings.ToLower(os.Getenv("DATABASE_TYPE")) {
-		case "postgres", "postgresql":
-			dsn = fmt.Sprintf(
-				"host=%s port=%s user=%s dbname=%s sslmode=%s timezone=UTC connect_timeout=5",
-				os.Getenv("DATABASE_HOST"),
-				os.Getenv("DATABASE_PORT"),
-				os.Getenv("DATABASE_USER"),
-				os.Getenv("DATABASE_NAME"),
-				os.Getenv("DATABASE_SSL_MODE"),
-			)
+	case "postgres", "postgresql":
+		dsn = fmt.Sprintf(
+			"host=%s port=%s user=%s dbname=%s sslmode=%s timezone=UTC connect_timeout=5",
+			os.Getenv("DATABASE_HOST"),
+			os.Getenv("DATABASE_PORT"),
+			os.Getenv("DATABASE_USER"),
+			os.Getenv("DATABASE_NAME"),
+			os.Getenv("DATABASE_SSL_MODE"),
+		)
 
-			if os.Getenv("DATABASE_PASS") != "" {
-				dsn = fmt.Sprintf("%s password=%s", dsn, os.Getenv("DATABASE_PASS"))
-			}
-		default:
+		if os.Getenv("DATABASE_PASS") != "" {
+			dsn = fmt.Sprintf("%s password=%s", dsn, os.Getenv("DATABASE_PASS"))
+		}
+	default:
 	}
 
 	return dsn

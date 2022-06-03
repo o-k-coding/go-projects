@@ -15,7 +15,11 @@ func (app *application) routes() *chi.Mux {
 
 	// routes come next
 
-	app.App.Routes.Get("/", app.Handlers.Home)
+	app.App.Routes.Group(func(r chi.Router) {
+		r.Use(app.Middleware.AuthRedirectGuard)
+		r.Get("/", app.Handlers.Home)
+
+	})
 	app.App.Routes.Get("/go-page", app.Handlers.GoPage)
 	app.App.Routes.Get("/jet-page", app.Handlers.JetPage)
 	app.App.Routes.Get("/session-page", app.Handlers.SessionPage)
@@ -78,6 +82,11 @@ func (app *application) routes() *chi.Mux {
 
 		fmt.Fprintf(w, "%s %s %d", u.FirstName, u.LastName, u.ID)
 	})
+
+
+	app.App.Routes.Get("/user/login", app.Handlers.UserLogin)
+	app.App.Routes.Post("/user/login", app.Handlers.PostUserLogin)
+	app.App.Routes.Get("/user/logout", app.Handlers.UserLogout)
 
 	// static routes
 

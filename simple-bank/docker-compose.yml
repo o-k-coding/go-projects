@@ -1,0 +1,16 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+  simple-bank-db:
+    container_name: 'simple-bank-db'
+    image: postgres
+    restart: always
+    env_file: .env
+    volumes:
+      - simple-bank-data:/var/lib/postgresql
+    ports:
+      - 5432:5432
+
+volumes:
+  simple-bank-data:

@@ -50,3 +50,8 @@ func (c *Session) InitSession() *scs.SessionManager {
 
 	return session
 }
+
+
+func IsAuthenticated(s *scs.SessionManager, r *http.Request) bool {
+	return s.Exists(r.Context(), "userEmail")
+}

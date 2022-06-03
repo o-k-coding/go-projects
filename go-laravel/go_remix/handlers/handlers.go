@@ -5,10 +5,13 @@ import (
 
 	"github.com/CloudyKit/jet/v6"
 	"github.com/okeefem2/celeritas"
+	"github.com/okeefem2/go_remix/data"
 )
 
+// I feel like this is just
 type Handlers struct {
 	App *celeritas.Celeritas
+	Models data.Models
 }
 
 func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {

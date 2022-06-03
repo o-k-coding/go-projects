@@ -8,6 +8,8 @@ import (
 	"text/template"
 
 	"github.com/CloudyKit/jet/v6"
+	"github.com/alexedwards/scs/v2"
+	"github.com/okeefem2/celeritas/session"
 )
 
 type Render struct {
@@ -17,6 +19,7 @@ type Render struct {
 	Port string
 	ServerName string
 	JetViews *jet.Set
+	Session *scs.SessionManager
 }
 
 type TemplateData struct {
@@ -29,6 +32,17 @@ type TemplateData struct {
 	Port string
 	ServerName string
 	Secure bool
+}
+
+func (re *Render) defaultData(td *TemplateData, r *http.Request) *TemplateData {
+	td.Secure = re.Secure
+	td.ServerName = re.ServerName
+	td.Port = re.Port
+	// This might be useful to codify
+	if session.IsAuthenticated(re.Session, r) {
+		td.IsAuthenticated = true
+	}
+	return td
 }
 
 func (re *Render) Page(w http.ResponseWriter, r *http.Request, view string, variables, data interface{}) error {
@@ -70,9 +84,11 @@ func (re *Render) JetPage(w http.ResponseWriter, r *http.Request, view string, v
 	}
 
 	td := &TemplateData{}
+	td = re.defaultData(td, r);
 	if data != nil {
 		td = data.(*TemplateData)
 	}
+
 
 	t, err := re.JetViews.GetTemplate(fmt.Sprintf("%s.jet", view))
 	// Note that the configured logger isn't accessible here, so that should be done as an improvement

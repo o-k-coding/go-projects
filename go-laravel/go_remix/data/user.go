@@ -78,7 +78,7 @@ func (u *UserModel) Get(id int) (*User, error) {
 	return &user, nil
 }
 
-func (u *UserModel)  LoadUserToken(user *User) error {
+func (u *UserModel) LoadUserToken(user *User) error {
 	// Could use an include syntax for joining potentially
 	token, err := u.tokens.LoadUserToken(user.ID)
 	if err != nil { return err }
@@ -126,17 +126,19 @@ func (u *UserModel) Insert(user *User) (int, error) {
 }
 
 // Might pass the id here and use that to load the user?
-func (u *UserModel) ResetPassword(user User, password string) error {
+func (u *UserModel) ResetPassword(id int, password string) error {
+	user, err := u.Get(id)
+	if err != nil { return err }
 	newHash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil { return err }
 	user.Password = string(newHash)
-	err = u.Update(&user)
+	err = u.Update(user)
 	if err != nil { return err }
 	return nil
 }
 
-func (u *UserModel) PasswordMatches(id int, plainText string) (bool, error) {
-	user, err := u.Get(id)
+func (u *UserModel) PasswordMatches(email string, plainText string) (bool, error) {
+	user, err := u.GetByEmail(email)
 	if err != nil { return false, err }
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(plainText))
