@@ -25,6 +25,12 @@ jobs:
     # - name: Build
     #   run: go build -v ./...
 
+    - name: Env
+      working-directory: ./simple-bank
+      run:
+        - touch .env
+        - echo ${{ secrets.SIMPLE_BANK_ENV }} > .env
+
     - name: Test
       working-directory: ./simple-bank
       run: make test
