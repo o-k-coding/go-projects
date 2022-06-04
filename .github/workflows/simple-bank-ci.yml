@@ -6,7 +6,7 @@ on:
   #   paths: [ "simple-bank" ]
   pull_request:
     branches: [ "main" ]
-    paths: [ "simple-bank" ]
+    paths: [ "simple-bank/**" ]
 
 jobs:
 
