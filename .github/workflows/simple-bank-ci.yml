@@ -5,30 +5,46 @@ on:
   #   branches: [ "main" ]
   #   paths: [ "simple-bank" ]
   pull_request:
-    branches: [ "main" ]
-    paths: [ "simple-bank/**" ]
+    branches: ["main"]
+    paths: ["simple-bank/**"]
 
 jobs:
-
   test:
     name: test
     runs-on: ubuntu-latest
+
+    # Opting to use docker-compose directly
+    # services:
+    #   # Label used to access the service container
+    #   postgres:
+    #     # Docker Hub image
+    #     image: postgres
+    #     # Provide the password for postgres
+    #     env:
+    #       POSTGRES_PASSWORD: postgres
+    #     # Set health checks to wait until postgres has started
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
+
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.17
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.17
 
-    # Build will happen automatically when running test
-    # - name: Build
-    #   run: go build -v ./...
+      - name: Env
+        working-directory: ./simple-bank
+        run: touch .env && echo ${{ secrets.SIMPLE_BANK_ENV }} > .env
 
-    - name: Env
-      working-directory: ./simple-bank
-      run: touch .env && echo ${{ secrets.SIMPLE_BANK_ENV }} > .env
+      - name: Set up services
+        working-directory: ./simple-bank
+        run: docker-compose up -d
 
-    - name: Test
-      working-directory: ./simple-bank
-      run: make test
+      - name: Test
+        working-directory: ./simple-bank
+        run: make test
