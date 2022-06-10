@@ -25,7 +25,6 @@ services:
     depends_on:
       simple-bank-db:
           condition: service_healthy
-    command: make migratedb
 
 volumes:
   simple-bank-data:
