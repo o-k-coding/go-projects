@@ -1,9 +1,6 @@
 name: simple-bank-ci-test
 
 on:
-  # push:
-  #   branches: [ "main" ]
-  #   paths: [ "simple-bank" ]
   pull_request:
     branches: ["main"]
     paths: ["simple-bank/**"]
@@ -13,21 +10,24 @@ jobs:
     name: test
     runs-on: ubuntu-latest
 
-    # Opting to use docker-compose directly
-    # services:
-    #   # Label used to access the service container
-    #   postgres:
-    #     # Docker Hub image
-    #     image: postgres
-    #     # Provide the password for postgres
-    #     env:
-    #       POSTGRES_PASSWORD: postgres
-    #     # Set health checks to wait until postgres has started
-    #     options: >-
-    #       --health-cmd pg_isready
-    #       --health-interval 10s
-    #       --health-timeout 5s
-    #       --health-retries 5
+    Opting to use docker-compose directly
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_SSL_MODE: ${{ secrets.POSTGRES_SSL_MODE }}
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v3
@@ -41,9 +41,13 @@ jobs:
         working-directory: ./simple-bank
         run: touch .env && echo ${{ secrets.SIMPLE_BANK_ENV }} > .env
 
-      - name: Set up services
+      # - name: Set up services
+      #   working-directory: ./simple-bank
+      #   run: docker-compose up -d
+
+      - name: Migrate
         working-directory: ./simple-bank
-        run: docker-compose up -d
+        run: make migratedb
 
       - name: Test
         working-directory: ./simple-bank
