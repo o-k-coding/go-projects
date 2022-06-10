@@ -45,6 +45,10 @@ jobs:
       #   working-directory: ./simple-bank
       #   run: docker-compose up -d
 
+      - name: Install migrate
+        working-directory: ./simple-bank
+        run: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
       - name: Migrate
         working-directory: ./simple-bank
         run: make migratedb
