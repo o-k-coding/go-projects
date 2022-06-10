@@ -16,6 +16,16 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  # This needs a dockerfile... but I think that's wasteful because the host machine will always have go installed already
+  migrate:
+    build:
+      context: ./
+      dockerfile: Dockerfile.migrate
+    container_name: 'simple-bank-db-migrate'
+    depends_on:
+      simple-bank-db:
+          condition: service_healthy
+    command: make migratedb
 
 volumes:
   simple-bank-data:

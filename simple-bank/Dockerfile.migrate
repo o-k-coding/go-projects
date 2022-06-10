@@ -1,0 +1,7 @@
+FROM golang:1.17-alpine
+ADD . /
+
+RUN apk add --no-cache make
+
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+CMD ["make",  "migratedb"]
