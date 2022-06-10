@@ -14,6 +14,7 @@ POSTGRES_PASSWORD=
 POSTGRES_USER=
 POSTGRES_DB=
 POSTGRES_PORT=
+POSTGRES_SSL_MODE=
 ```
 
 the docker compose file will load the .env file, so your postgres instance will be set up with the values from that file. You can then use those same values to connect.
