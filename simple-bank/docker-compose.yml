@@ -13,18 +13,19 @@ services:
       - 5432:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
   # This needs a dockerfile... but I think that's wasteful because the host machine will always have go installed already
   migrate:
+    depends_on:
+      simple-bank-db:
+          condition: service_healthy
     build:
       context: ./
       dockerfile: Dockerfile.migrate
     container_name: 'simple-bank-db-migrate'
-    depends_on:
-      simple-bank-db:
-          condition: service_healthy
+
 
 volumes:
   simple-bank-data:
