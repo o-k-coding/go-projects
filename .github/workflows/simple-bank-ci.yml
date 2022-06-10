@@ -51,7 +51,7 @@ jobs:
 
       - name: Migrate
         working-directory: ./simple-bank
-        run: make migratedb
+        run: migrate -path db/migrations -database "postgresql://${{secrets.POSTGRES_USER}}:${{secrets.POSTGRES_PASSWORD}}@${{secrets.DB_HOST}}:${{secrets.POSTGRES_PORT}}/${{secrets.POSTGRES_DB}}?sslmode=${{secrets.POSTGRES_SSL_MODE}}" -verbose up
 
       - name: Test
         working-directory: ./simple-bank
