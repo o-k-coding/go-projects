@@ -10,7 +10,7 @@ jobs:
     name: test
     runs-on: ubuntu-latest
 
-    Opting to use docker-compose directly
+    # Opting to use docker-compose directly
     services:
       # Label used to access the service container
       postgres:
