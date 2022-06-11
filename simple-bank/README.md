@@ -9,7 +9,7 @@ requires go, docker
 create a .env file and add values for the following variables
 
 ```bash
-DB_HOST=
+POSTGRES_HOST=
 POSTGRES_PASSWORD=
 POSTGRES_USER=
 POSTGRES_DB=
@@ -49,7 +49,7 @@ to run migrations
 
 ```bash
 source .env
-migrate -path db/migrations -database "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable" -verbose up
+migrate -path db/migrations -database "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable" -verbose up
 ```
 
 - with make <https://simplernerd.com/make-pass-env-nested/>

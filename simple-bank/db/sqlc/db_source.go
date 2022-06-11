@@ -12,7 +12,7 @@ func buildPostgresDBSource() (string, error) {
 	err := godotenv.Load("../../.env")
 	user := os.Getenv("POSTGRES_USER")
 	password := os.Getenv("POSTGRES_PASSWORD")
-	host := os.Getenv("DB_HOST")
+	host := os.Getenv("POSTGRES_HOST")
 	port := os.Getenv("POSTGRES_PORT")
 	db := os.Getenv("POSTGRES_DB")
 	sslMode := os.Getenv("POSTGRES_SSL_MODE")
