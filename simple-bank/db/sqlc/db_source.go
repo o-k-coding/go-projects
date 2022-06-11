@@ -28,5 +28,5 @@ func buildPostgresDBSource() (string, error) {
 	db := os.Getenv("POSTGRES_DB")
 	sslMode := os.Getenv("POSTGRES_SSL_MODE")
 
-	return fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=%s", user, password, host, port, db, sslMode), err
+	return fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=%s", user, password, host, port, db, sslMode), nil
 }
