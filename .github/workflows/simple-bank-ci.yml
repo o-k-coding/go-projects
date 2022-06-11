@@ -60,4 +60,10 @@ jobs:
 
       - name: Test
         working-directory: ./simple-bank
+        env:
+          POSTGRES_DB: simple-bank
+          POSTGRES_USER: simple-bank-user
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_SSL_MODE: disable
+          POSTGRES_PORT: 5432
         run: make test

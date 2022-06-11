@@ -141,3 +141,7 @@ I think using a UUID from the application could be a good way to help handle thi
 Github actions are defined in the top level .github/workflows folder, named by project
 
 this is also an interesting structure I found for a monorepo <https://github.com/zladovan/monorepo/tree/master/.github/workflows>
+
+Look into this method for using an env file <https://stackoverflow.com/questions/67964110/how-to-access-secrets-when-using-flutter-web-with-github-actions/67998780#67998780>
+
+the only problem is that I can't pass it to the postgres service which is super annoying
