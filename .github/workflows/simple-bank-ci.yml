@@ -21,6 +21,7 @@ jobs:
           POSTGRES_DB: simple-bank
           POSTGRES_USER: simple-bank-user
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_SSL_MODE: disable
         ports:
           - 5432:5432
         # Set health checks to wait until postgres has started
