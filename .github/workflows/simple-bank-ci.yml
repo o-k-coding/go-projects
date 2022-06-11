@@ -39,9 +39,9 @@ jobs:
         with:
           go-version: 1.17
 
-      - name: Env
-        working-directory: ./simple-bank
-        run: touch .env && echo ${{ secrets.SIMPLE_BANK_ENV }} > .env
+      # - name: Env
+      #   working-directory: ./simple-bank
+      #   run: touch .env && echo ${{ secrets.SIMPLE_BANK_ENV }} > .env
 
       # - name: Set up services
       #   working-directory: ./simple-bank
