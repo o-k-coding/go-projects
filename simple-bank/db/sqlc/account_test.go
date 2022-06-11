@@ -88,13 +88,13 @@ func TestListAccounts(t *testing.T) {
 	}
 
 	params := ListAccountsParams{
-		Offset: 5,
+		Offset: 1,
 		Limit:  5,
 	}
 
 	accounts, err := testQueries.ListAccounts(ctx, params)
 	require.NoError(t, err, "error listing accounts")
-	require.Len(t, accounts, 5, "inccorect number of accounts listed")
+	require.Len(t, accounts, 5, "incorrect number of accounts listed")
 
 	// The accounts should be sorted by name
 	sortedAccounts := make([]Account, len(accounts))
