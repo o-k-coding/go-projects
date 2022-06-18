@@ -18,10 +18,11 @@ jobs:
         image: postgres
         # Provide the password for postgres
         env:
-          POSTGRES_DB: simple-bank
-          POSTGRES_USER: simple-bank-user
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_SSL_MODE: disable
+          POSTGRES_SSL_MODE: ${{ secrets.POSTGRES_SSL_MODE }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
         ports:
           - 5432:5432
         # Set health checks to wait until postgres has started
@@ -56,14 +57,14 @@ jobs:
 
       - name: Migrate
         working-directory: ./simple-bank
-        run: migrate -path db/migrations -database "postgresql://simple-bank-user:${{secrets.POSTGRES_PASSWORD}}@localhost:5432/simple-bank?sslmode=disable" -verbose up
+        run: migrate -path db/migrations -database "postgresql://${{ secrets.POSTGRES_USER }}:${{secrets.POSTGRES_PASSWORD}}@${{ secrets.POSTGRES_HOST }}:${{ secrets.POSTGRES_PORT }}/${{ secrets.POSTGRES_DB }}?sslmode=${{ secrets.POSTGRES_SSL_MODE }}" -verbose up
 
       - name: Test
         working-directory: ./simple-bank
         env:
-          POSTGRES_DB: simple-bank
-          POSTGRES_USER: simple-bank-user
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_SSL_MODE: disable
-          POSTGRES_PORT: 5432
+          POSTGRES_SSL_MODE: ${{ secrets.POSTGRES_SSL_MODE }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
         run: make test
