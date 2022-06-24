@@ -1,0 +1,28 @@
+###### Valid create
+curl -X POST http://localhost:8080/accounts \
+  --data '{ "owner": "Crokus Younghand", "currency": "jakatas" }'
+
+###### Invalid currency
+curl -X POST http://localhost:8080/accounts \
+--data '{ "owner": "Crokus Younghand", "currency": "EUR" }'
+
+###### Missing required owner currency
+curl -X POST http://localhost:8080/accounts \
+--data '{ "owner": "", "currency": "jakatas" }'
+
+###### Valid get
+curl "http://localhost:8080/accounts/5c8b2ef6-1b04-4486-9c6a-aba1e791e343"
+
+
+###### Not found get
+curl "http://localhost:8080/accounts/5c8b2ef6-1b04-4486-9c6a-aba1e791e342"
+
+
+###### Valid list accounts wih defaults
+curl "http://localhost:8080/accounts"
+
+###### Valid list accounts page 2
+curl "http://localhost:8080/accounts?page=2&pageSize=10"
+
+###### Valid list accounts empty page
+curl "http://localhost:8080/accounts?page=10000&pageSize=10"

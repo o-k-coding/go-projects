@@ -18,9 +18,9 @@ type Store struct {
 	db *sql.DB // Required to create new transaciton
 }
 
-func Newstore(db *sql.DB) *Store {
+func NewStore(db *sql.DB) *Store {
 	return &Store{
-		db: db,
+		db:      db,
 		Queries: New(db),
 	}
 }
@@ -49,16 +49,16 @@ func (store *Store) execTransaction(ctx context.Context, fn func(*Queries) error
 
 type TransferTxParams struct {
 	FromAccountId uuid.UUID `json:"fromAccountId"`
-	ToAccountId uuid.UUID `json:"toAccountId"`
-	Amount int64 `json:"amount"`
+	ToAccountId   uuid.UUID `json:"toAccountId"`
+	Amount        int64     `json:"amount"`
 }
 
 type TransferTxResult struct {
-	Transfer Transfer `json:"transfer"`
-	FromAccount Account `json:"fromAccount"`
-	ToAccount Account `json:"toAccount"`
-	FromEntry Entry `json:"fromEntry"`
-	ToEntry Entry `json:"toEntry"`
+	Transfer    Transfer `json:"transfer"`
+	FromAccount Account  `json:"fromAccount"`
+	ToAccount   Account  `json:"toAccount"`
+	FromEntry   Entry    `json:"fromEntry"`
+	ToEntry     Entry    `json:"toEntry"`
 }
 
 var txKey = struct{}{}
@@ -86,7 +86,7 @@ func (store *Store) TransferTx(ctx context.Context, params TransferTxParams) (Tr
 		// fmt.Println(txName, "create from entry")
 		result.FromEntry, err = q.CreateEntry(ctx, CreateEntryParams{
 			AccountID: params.FromAccountId,
-			Amount: -params.Amount,
+			Amount:    -params.Amount,
 		})
 
 		if err != nil {
@@ -96,7 +96,7 @@ func (store *Store) TransferTx(ctx context.Context, params TransferTxParams) (Tr
 		// fmt.Println(txName, "create to entry")
 		result.ToEntry, err = q.CreateEntry(ctx, CreateEntryParams{
 			AccountID: params.ToAccountId,
-			Amount: params.Amount,
+			Amount:    params.Amount,
 		})
 
 		if err != nil {
@@ -136,16 +136,16 @@ func (store *Store) TransferTx(ctx context.Context, params TransferTxParams) (Tr
 		// So we solve it by always executing in a consistent order based on the account id
 		addBalanceParams := []AddAccountBalanceParams{
 			{
-				ID: params.FromAccountId,
+				ID:     params.FromAccountId,
 				Amount: -params.Amount,
 			},
 			{
-				ID: params.ToAccountId,
+				ID:     params.ToAccountId,
 				Amount: params.Amount,
 			},
 		}
 
-		sort.Slice(addBalanceParams, func (i, j int) bool  {
+		sort.Slice(addBalanceParams, func(i, j int) bool {
 			return addBalanceParams[i].ID.String() < addBalanceParams[j].ID.String()
 		})
 
@@ -157,14 +157,16 @@ func (store *Store) TransferTx(ctx context.Context, params TransferTxParams) (Tr
 				// then you will never get the ToAccount here
 				// I would either not make it possible to get this far if they are the same
 				// or I would check the existance of the account on the result, and the amount as well
-			} else if (param.ID == params.FromAccountId) {
+			} else if param.ID == params.FromAccountId {
 				result.FromAccount = account
 			} else {
 				result.ToAccount = account
 			}
 		}
 
-		if err != nil { return err }
+		if err != nil {
+			return err
+		}
 
 		return nil
 	})
