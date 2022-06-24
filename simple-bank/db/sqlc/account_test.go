@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"sort"
 	"testing"
 
@@ -12,8 +13,8 @@ import (
 
 func createRandomNewAccount() CreateAccountParams {
 	return CreateAccountParams{
-		Owner: util.RandomOwner(),
-		Balance: util.RandomMoney(),
+		Owner:    util.RandomOwner(),
+		Balance:  util.RandomMoney(),
 		Currency: util.RandomCurrency(),
 	}
 }
@@ -63,7 +64,7 @@ func TestUpdateAccountBalance(t *testing.T) {
 	require.NoError(t, err, "error creating account to get")
 
 	updateParams := UpdateAccountBalanceParams{
-		ID: account.ID,
+		ID:      account.ID,
 		Balance: account.Balance + 10,
 	}
 
@@ -80,17 +81,20 @@ func TestListAccounts(t *testing.T) {
 	// Just to ensure there are least 6 entries in the DB to work with.
 	for i := 0; i < 6; i++ {
 		account := createRandomNewAccount()
-		_, _ = testQueries.CreateAccount(ctx, account)
+		_, err := testQueries.CreateAccount(ctx, account)
+		if err != nil {
+			fmt.Println("Error creating random new account", err)
+		}
 	}
 
 	params := ListAccountsParams{
-		Offset: 5,
-		Limit: 5,
+		Offset: 1,
+		Limit:  5,
 	}
 
 	accounts, err := testQueries.ListAccounts(ctx, params)
 	require.NoError(t, err, "error listing accounts")
-	require.Len(t, accounts, 5, "inccorect number of accounts listed")
+	require.Len(t, accounts, 5, "incorrect number of accounts listed")
 
 	// The accounts should be sorted by name
 	sortedAccounts := make([]Account, len(accounts))

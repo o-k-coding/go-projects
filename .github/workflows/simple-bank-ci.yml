@@ -1,34 +1,70 @@
 name: simple-bank-ci-test
 
 on:
-  # push:
-  #   branches: [ "main" ]
-  #   paths: [ "simple-bank" ]
   pull_request:
-    branches: [ "main" ]
-    paths: [ "simple-bank/**" ]
+    branches: ["main"]
+    paths: ["simple-bank/**"]
 
 jobs:
-
   test:
     name: test
     runs-on: ubuntu-latest
+
+    # Opting to use docker-compose directly
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_SSL_MODE: ${{ secrets.POSTGRES_SSL_MODE }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.17
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.17
 
-    # Build will happen automatically when running test
-    # - name: Build
-    #   run: go build -v ./...
+      # - name: Env
+      #   working-directory: ./simple-bank
+      #   run: touch .env && echo ${{ secrets.SIMPLE_BANK_ENV }} > .env
 
-    - name: Env
-      working-directory: ./simple-bank
-      run: touch .env && echo ${{ secrets.SIMPLE_BANK_ENV }} > .env
+      # - name: Set up services
+      #   working-directory: ./simple-bank
+      #   run: docker-compose up -d
 
-    - name: Test
-      working-directory: ./simple-bank
-      run: make test
+      - name: Install migrate
+        working-directory: ./simple-bank
+        run: |
+          curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
+          sudo mv migrate /usr/bin/migrate
+          which migrate
+
+      - name: Migrate
+        working-directory: ./simple-bank
+        run: migrate -path db/migrations -database "postgresql://${{ secrets.POSTGRES_USER }}:${{secrets.POSTGRES_PASSWORD}}@${{ secrets.POSTGRES_HOST }}:${{ secrets.POSTGRES_PORT }}/${{ secrets.POSTGRES_DB }}?sslmode=${{ secrets.POSTGRES_SSL_MODE }}" -verbose up
+
+      - name: Test
+        working-directory: ./simple-bank
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_SSL_MODE: ${{ secrets.POSTGRES_SSL_MODE }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+        run: make test

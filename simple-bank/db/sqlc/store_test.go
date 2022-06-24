@@ -12,7 +12,7 @@ func TestTransferTx(t *testing.T) {
 
 	ctx := context.Background()
 
-	store := Newstore(testDB)
+	store := NewStore(testDB)
 
 	// Note, using smaller, nice numbers for easier debugging
 	account1Params := createRandomNewAccount()
@@ -34,15 +34,15 @@ func TestTransferTx(t *testing.T) {
 	results := make(chan TransferTxResult)
 	amount := int64(10)
 
-	for i := 0; i < n; i ++ {
+	for i := 0; i < n; i++ {
 
 		txName := fmt.Sprintf("tx %d", i)
 		go func() {
 			txCtx := context.WithValue(ctx, txKey, txName)
 			result, err := store.TransferTx(txCtx, TransferTxParams{
 				FromAccountId: account1.ID,
-				ToAccountId: account2.ID,
-				Amount: amount,
+				ToAccountId:   account2.ID,
+				Amount:        amount,
 			})
 
 			errs <- err
@@ -52,12 +52,12 @@ func TestTransferTx(t *testing.T) {
 
 	existedTxs := make(map[int]bool)
 	// Check the results from each transaction in each go routine
-	for i := 0; i < n; i ++ {
-		err := <- errs
+	for i := 0; i < n; i++ {
+		err := <-errs
 		// Remember they may not be in the same order, I could label them though in a way
 		require.NoError(t, err, fmt.Sprintf("transaction %d had an error", i))
 
-		result := <- results
+		result := <-results
 		require.NotEmpty(t, result, fmt.Sprintf("result %d is empty", i))
 
 		require.NotEmpty(t, result.Transfer)
@@ -70,7 +70,6 @@ func TestTransferTx(t *testing.T) {
 		require.NotEmpty(t, result.FromAccount)
 		require.Equal(t, account1.ID, result.FromAccount.ID)
 
-
 		require.NotEmpty(t, result.ToAccount)
 		require.Equal(t, account2.ID, result.ToAccount.ID)
 		fromDiff := account1.Balance - result.FromAccount.Balance
@@ -80,7 +79,7 @@ func TestTransferTx(t *testing.T) {
 		// require.Equal(t, fromDiff, amount * int64(i))
 		require.Equal(t, fromDiff, toDiff)
 		require.True(t, fromDiff > 0)
-		require.True(t, fromDiff % amount == 0)
+		require.True(t, fromDiff%amount == 0)
 
 		// Track which txs we have had by using the number of times the amount has gone into the diff so far
 		k := int(fromDiff / amount)
@@ -105,10 +104,10 @@ func TestTransferTx(t *testing.T) {
 
 	updatedFromAccount, err := store.GetAccount(ctx, account1.ID)
 	require.NoError(t, err)
-	require.Equal(t, account1.Balance - totalChange, updatedFromAccount.Balance)
+	require.Equal(t, account1.Balance-totalChange, updatedFromAccount.Balance)
 	updatedToAccount, err := store.GetAccount(ctx, account2.ID)
 	require.NoError(t, err)
-	require.Equal(t, account2.Balance + totalChange, updatedToAccount.Balance)
+	require.Equal(t, account2.Balance+totalChange, updatedToAccount.Balance)
 
 }
 
@@ -120,7 +119,7 @@ func TestTransferTxDeadlock(t *testing.T) {
 
 	ctx := context.Background()
 
-	store := Newstore(testDB)
+	store := NewStore(testDB)
 
 	// Note, using smaller, nice numbers for easier debugging
 	account1Params := createRandomNewAccount()
@@ -140,7 +139,7 @@ func TestTransferTxDeadlock(t *testing.T) {
 	errs := make(chan error)
 	amount := int64(10)
 
-	for i := 0; i < n; i ++ {
+	for i := 0; i < n; i++ {
 
 		txName := fmt.Sprintf("tx %d", i)
 
@@ -148,7 +147,7 @@ func TestTransferTxDeadlock(t *testing.T) {
 		// half send money from 2 -> 1
 		fromAccountID := account1.ID
 		toAccountID := account2.ID
-		if i % 2 == 1 {
+		if i%2 == 1 {
 			fromAccountID = account2.ID
 			toAccountID = account1.ID
 		}
@@ -156,16 +155,16 @@ func TestTransferTxDeadlock(t *testing.T) {
 			txCtx := context.WithValue(ctx, txKey, txName)
 			_, err := store.TransferTx(txCtx, TransferTxParams{
 				FromAccountId: fromAccountID,
-				ToAccountId: toAccountID,
-				Amount: amount,
+				ToAccountId:   toAccountID,
+				Amount:        amount,
 			})
 
 			errs <- err
 		}()
 	}
 
-	for i := 0; i < n; i ++ {
-		err := <- errs
+	for i := 0; i < n; i++ {
+		err := <-errs
 		require.NoError(t, err, fmt.Sprintf("transaction %d had an error", i))
 	}
 	// Both account should end where they began because they both have an equal number of from and to transfers with the same money amount
