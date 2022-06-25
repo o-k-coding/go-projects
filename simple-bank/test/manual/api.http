@@ -18,11 +18,11 @@ curl "http://localhost:8080/accounts/5c8b2ef6-1b04-4486-9c6a-aba1e791e343"
 curl "http://localhost:8080/accounts/5c8b2ef6-1b04-4486-9c6a-aba1e791e342"
 
 
-###### Valid list accounts wih defaults
+###### Invalid list accounts wih nothing passed
 curl "http://localhost:8080/accounts"
 
-###### Valid list accounts page 2
-curl "http://localhost:8080/accounts?page=2&pageSize=10"
+###### Valid list accounts page 1
+curl "http://localhost:8080/accounts?page=1&pageSize=10"
 
 ###### Valid list accounts empty page
 curl "http://localhost:8080/accounts?page=10000&pageSize=10"

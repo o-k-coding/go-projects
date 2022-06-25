@@ -73,9 +73,10 @@ func (server *Server) getAccount(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, account)
 }
 
+// NOTE props must be public for tags to work properly lol. DINGUS
 type listAccountsRequest struct {
-	pageSize int32 `form:"pageSize" binding:"required,min=1"`
-	page     int32 `form:"page" binding:"required,min=1"`
+	PageSize int32 `form:"pageSize" binding:"required,min=1"`
+	Page     int32 `form:"page" binding:"required,min=1"`
 }
 
 type ListAccountsResponse struct {
@@ -94,14 +95,13 @@ func (server *Server) listAccounts(ctx *gin.Context) {
 		return
 	}
 
-	// TODO the defaults are always being set... sad
-	// Since the bindings will only work if the query params are actually defined
-	//I am leaving this in
+	// Bindings will always catch invalid state, so this is not needed
+	// I am leaving this in as an example for me though
 	req = setListPageDefaults(req)
 
 	listParams := db.ListAccountsParams{
-		Limit:  req.pageSize,
-		Offset: calculatePageOffset(req.pageSize, req.page),
+		Limit:  req.PageSize,
+		Offset: calculatePageOffset(req.PageSize, req.Page),
 	}
 
 	accounts, err := server.store.ListAccounts(ctx, listParams)
@@ -117,19 +117,19 @@ func (server *Server) listAccounts(ctx *gin.Context) {
 
 	res := ListAccountsResponse{
 		accounts,
-		req.page,
-		req.pageSize,
+		req.Page,
+		req.PageSize,
 	}
 
 	ctx.JSON(http.StatusOK, res)
 }
 
 func setListPageDefaults(req listAccountsRequest) listAccountsRequest {
-	if req.page < 1 {
-		req.page = 1
+	if req.Page < 1 {
+		req.Page = 1
 	}
-	if req.pageSize < 1 {
-		req.pageSize = 10
+	if req.PageSize < 1 {
+		req.PageSize = 10
 	}
 	return req
 }

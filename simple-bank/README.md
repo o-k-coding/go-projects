@@ -37,6 +37,14 @@ used "Go Toolchain" to install, all other methods failed for me in WSL2 lol.
 go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 ```
 
+for make, used homebrew
+
+```bash
+brew install golang-migrate
+```
+
+There is a cool pattern used at work where the tools are installed in a dir in the repo dir, and used in there. Like how npm resolves tools in node modules via package json basically.
+
 ```bash
 migrate create -ext sql -dir db/migrations -seq init_schema
 ```
