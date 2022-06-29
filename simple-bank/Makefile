@@ -13,4 +13,4 @@ test:
 server:
 	go run main.go
 
-.PHONY: server
+.PHONY: server test

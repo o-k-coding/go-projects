@@ -3,14 +3,16 @@ package db
 import (
 	"database/sql"
 	"log"
+
+	"github.com/okeefem2/simple_bank/config"
 )
 
 const (
 	dbDriver = "postgres"
 )
 
-func ConnectPostgres() *sql.DB {
-	dbSource, err := buildPostgresDBSource()
+func ConnectPostgres(config *config.Config) *sql.DB {
+	dbSource, err := buildPostgresDBSource(config)
 	if err != nil {
 		log.Fatal("error building db source string for tests", err)
 	}

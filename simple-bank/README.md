@@ -87,8 +87,6 @@ go install github.com/kyleconroy/sqlc/cmd/sqlc@latest
 
 <https://github.com/lib/pq>
 
-## Testing
-
 ### Deadlocks
 
 Intuitive, but it was nice to walk through an example where he had all the queries for a transaction written out
@@ -102,9 +100,9 @@ One way to fix this is to remove the fk constraints...
 This is not the best solution though if you need this contraint
 Instead we can tell PG that we are only selecting for NO KEY UPDATE
 
-## DB Transactions Isolation levels
+### DB Transactions Isolation levels
 
-### Read Phenomena
+#### Read Phenomena
 
 Dirty read - tx reads data written by other uncommitted tx.
 
@@ -114,19 +112,19 @@ phantom read - tx executes a query multiple times and gets a different set of ro
 
 serialization anomaly - result of a group of txs impossible to achieve if we run them sequentially in any order without overlapping
 
-### 4 standard ANSI isolation levels
+#### 4 standard ANSI isolation levels
 
-#### Read Uncommitted
+##### Read Uncommitted
 
 can see data written by other uncommitted txs (dirty read, yes phantom read/non repeatable)
 
 in PG, this behaves the same as Read Committed due to the architecture.
 
-#### Read Committed
+##### Read Committed
 
 can only see data written by committed txns (no dirty read, yes phantom read/non repeatable)
 
-#### Repeatable Read
+##### Repeatable Read
 
 same read query always returns same result (no dirty read, no phantom read, no non repeatable)
 
@@ -134,7 +132,7 @@ in mysql, two txs can update the same row though, and both updates will be appli
 
 PG throws an error if two txs try to update the same data.
 
-#### Serializable
+##### Serializable
 
 Can achieve the same result if txs are executes in some order rather than concurrently. (result will always be the same).
 
@@ -153,3 +151,8 @@ this is also an interesting structure I found for a monorepo <https://github.com
 Look into this method for using an env file <https://stackoverflow.com/questions/67964110/how-to-access-secrets-when-using-flutter-web-with-github-actions/67998780#67998780>
 
 the only problem is that I can't pass it to the postgres service which is super annoying
+
+## Viper
+
+Can read from a remote system like consul or etcd
+Has ability to live watch writing to the config file

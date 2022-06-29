@@ -100,7 +100,10 @@ func TestListAccounts(t *testing.T) {
 	sortedAccounts := make([]Account, len(accounts))
 	copy(sortedAccounts, accounts)
 	sort.Slice(sortedAccounts, func(i, j int) bool {
-		return sortedAccounts[i].Owner < sortedAccounts[j].Owner
+		// Wonder if string comp would be faster?
+		// Note I had these ordered by name before, but name is not unique, so this causes some trouble
+		// Nicely though, this test caught that sly bug. if it is a bug? idk not necessarily.
+		return sortedAccounts[i].CreatedAt.Before(sortedAccounts[j].CreatedAt)
 	})
 
 	for i, account := range accounts {
