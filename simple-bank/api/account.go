@@ -13,7 +13,7 @@ type createAccountRequest struct {
 	Owner string `json:"owner" binding:"required"`
 	// The oneof binding is definitely not very dynamic, would be interested if there are other options with gin
 	// probably better to validate ourselves for anything more complex.
-	Currency string `json:"currency" binding:"required,oneof=jakatas usd"`
+	Currency string `json:"currency" binding:"required,currency"`
 }
 
 func (server *Server) createAccount(ctx *gin.Context) {

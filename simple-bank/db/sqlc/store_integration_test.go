@@ -20,9 +20,9 @@ func TestTransferTx(t *testing.T) {
 	account2Params := createRandomNewAccount()
 	account2Params.Balance = 100
 
-	account1, err := store.Queries.CreateAccount(ctx, account1Params)
+	account1, err := store.CreateAccount(ctx, account1Params)
 	require.NoError(t, err, "error creating account 1")
-	account2, err := store.Queries.CreateAccount(ctx, account2Params)
+	account2, err := store.CreateAccount(ctx, account2Params)
 	require.NoError(t, err, "error creating account 2")
 
 	// Run concurrent transfer txs
@@ -127,9 +127,9 @@ func TestTransferTxDeadlock(t *testing.T) {
 	account2Params := createRandomNewAccount()
 	account2Params.Balance = 100
 
-	account1, err := store.Queries.CreateAccount(ctx, account1Params)
+	account1, err := store.CreateAccount(ctx, account1Params)
 	require.NoError(t, err, "error creating account 1")
-	account2, err := store.Queries.CreateAccount(ctx, account2Params)
+	account2, err := store.CreateAccount(ctx, account2Params)
 	require.NoError(t, err, "error creating account 2")
 
 	// Run concurrent transfer txs

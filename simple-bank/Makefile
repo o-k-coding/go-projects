@@ -13,4 +13,7 @@ test:
 server:
 	go run main.go
 
-.PHONY: server test
+mock:
+	mockgen -package mockdb -destination db/mock/store.go github.com/okeefem2/simple_bank/db/sqlc Store
+
+.PHONY: server test mock

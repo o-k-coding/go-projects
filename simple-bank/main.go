@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	_ "github.com/golang/mock/mockgen/model"
 	_ "github.com/lib/pq"
 	"github.com/okeefem2/simple_bank/api"
 	"github.com/okeefem2/simple_bank/config"

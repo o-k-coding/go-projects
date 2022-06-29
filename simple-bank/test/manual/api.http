@@ -2,6 +2,14 @@
 curl -X POST http://localhost:8080/accounts \
   --data '{ "owner": "Crokus Younghand", "currency": "jakatas" }'
 
+###### Valid create 2
+curl -X POST http://localhost:8080/accounts \
+  --data '{ "owner": "Crokus Oldhand", "currency": "jakatas" }'
+
+###### Valid create 3
+curl -X POST http://localhost:8080/accounts \
+  --data '{ "owner": "Michael OKeefe", "currency": "usd" }'
+
 ###### Invalid currency
 curl -X POST http://localhost:8080/accounts \
 --data '{ "owner": "Crokus Younghand", "currency": "EUR" }'
@@ -26,3 +34,19 @@ curl "http://localhost:8080/accounts?page=1&pageSize=10"
 
 ###### Valid list accounts empty page
 curl "http://localhost:8080/accounts?page=10000&pageSize=10"
+
+
+###### Valid transfer
+## NOTE this will required two accounts first - crokus younghand and crokus oldhand
+curl -X POST http://localhost:8080/transfers \
+  --data '{ "fromAccountId": "3acec005-c175-454a-a41d-216eb33f000c", "toAccountId": "81e402b7-ba1c-42e8-8a5a-95625a8be919", "amount": 100, "currency": "jakatas" }'
+
+###### Invalid transfer (currency mismatch)
+## NOTE this will required two accounts first - crokus younghand and michael okeefe
+curl -X POST http://localhost:8080/transfers \
+  --data '{ "fromAccountId": "3acec005-c175-454a-a41d-216eb33f000c", "toAccountId": "2ba06319-594d-4dce-a9db-a45ec23344fb", "amount": 100, "currency": "jakatas" }'
+
+###### Invalid transfer (invalid currency)
+## NOTE this will required two accounts first - crokus younghand and michael okeefe
+curl -X POST http://localhost:8080/transfers \
+  --data '{ "fromAccountId": "3acec005-c175-454a-a41d-216eb33f000c", "toAccountId": "2ba06319-594d-4dce-a9db-a45ec23344fb", "amount": 100, "currency": "eur" }'

@@ -159,10 +159,12 @@ Has ability to live watch writing to the config file
 
 ## Mockgen
 
+note I had to add an empty import for mockgen in the main.go file.
+
 give the path to the package
 the name of the interface
 output file (so it won't write to stdout)
 
 ```sh
-mockgen db/sqlc Store
+mockgen -package mockdb -destination db/mock/store.go github.com/okeefem2/simple_bank/db/sqlc Store
 ```
