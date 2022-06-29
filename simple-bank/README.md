@@ -156,3 +156,13 @@ the only problem is that I can't pass it to the postgres service which is super 
 
 Can read from a remote system like consul or etcd
 Has ability to live watch writing to the config file
+
+## Mockgen
+
+give the path to the package
+the name of the interface
+output file (so it won't write to stdout)
+
+```sh
+mockgen db/sqlc Store
+```

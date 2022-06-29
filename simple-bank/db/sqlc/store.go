@@ -9,24 +9,30 @@ import (
 	"github.com/google/uuid"
 )
 
+type Store interface {
+	// Composition with Queries
+	Querier
+	TransferTx(ctx context.Context, params TransferTxParams) (TransferTxResult, error)
+}
+
 // Provide functions to exec db queries and txs
 // This is a composition exposing the Queries functionality with the added Transaction functionality
 // prefer composition over inheritance!
 // I could see this as the public API for a package over the queries piece
-type Store struct {
+type SQLStore struct {
 	*Queries
 	db *sql.DB // Required to create new transaciton
 }
 
-func NewStore(db *sql.DB) *Store {
-	return &Store{
+func NewStore(db *sql.DB) Store {
+	return &SQLStore{
 		db:      db,
 		Queries: New(db),
 	}
 }
 
 // only expose functions that use this to do some unit of work
-func (store *Store) execTransaction(ctx context.Context, fn func(*Queries) error) error {
+func (store *SQLStore) execTransaction(ctx context.Context, fn func(*Queries) error) error {
 	tx, err := store.db.BeginTx(ctx, nil)
 
 	if err != nil {
@@ -64,7 +70,7 @@ type TransferTxResult struct {
 var txKey = struct{}{}
 
 // Perform a money transfer from one account to another
-func (store *Store) TransferTx(ctx context.Context, params TransferTxParams) (TransferTxResult, error) {
+func (store *SQLStore) TransferTx(ctx context.Context, params TransferTxParams) (TransferTxResult, error) {
 	var result TransferTxResult
 
 	err := store.execTransaction(ctx, func(q *Queries) error {
