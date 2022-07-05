@@ -8,22 +8,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-
 func TestCreateTransfer(t *testing.T) {
 	ctx := context.Background()
-	accountParamsOne := createRandomNewAccount()
-	accountParamsTwo := createRandomNewAccount()
 
-	accountOne, err := testQueries.CreateAccount(context.Background(), accountParamsOne)
-	require.NoError(t, err)
-
-	accountTwo, err := testQueries.CreateAccount(context.Background(), accountParamsTwo)
-	require.NoError(t, err)
+	accountOne := createNewTestAccount(t)
+	accountTwo := createNewTestAccount(t)
 
 	transferParams := CreateTransferParams{
 		FromAccountID: accountOne.ID,
-		ToAccountID: accountTwo.ID,
-		Amount: util.RandomMoney(),
+		ToAccountID:   accountTwo.ID,
+		Amount:        util.RandomMoney(),
 	}
 
 	transfer, err := testQueries.CreateTransfer(ctx, transferParams)
@@ -40,19 +34,13 @@ func TestCreateTransfer(t *testing.T) {
 
 func TestGetTransfer(t *testing.T) {
 	ctx := context.Background()
-	accountParamsOne := createRandomNewAccount()
-	accountParamsTwo := createRandomNewAccount()
-
-	accountOne, err := testQueries.CreateAccount(context.Background(), accountParamsOne)
-	require.NoError(t, err)
-
-	accountTwo, err := testQueries.CreateAccount(context.Background(), accountParamsTwo)
-	require.NoError(t, err)
+	accountOne := createNewTestAccount(t)
+	accountTwo := createNewTestAccount(t)
 
 	transferParams := CreateTransferParams{
 		FromAccountID: accountOne.ID,
-		ToAccountID: accountTwo.ID,
-		Amount: util.RandomMoney(),
+		ToAccountID:   accountTwo.ID,
+		Amount:        util.RandomMoney(),
 	}
 
 	transfer, err := testQueries.CreateTransfer(ctx, transferParams)

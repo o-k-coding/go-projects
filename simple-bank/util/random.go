@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"math/rand"
 	"strings"
 	"time"
@@ -15,7 +16,7 @@ func init() {
 }
 
 func RandomInt(min, max int64) int64 {
-	return min + rand.Int63n(max - min + 1)
+	return min + rand.Int63n(max-min+1)
 }
 
 func RandomString(n int) string {
@@ -35,6 +36,10 @@ func RandomOwner() string {
 	return RandomString(6)
 }
 
+func RandomEmail() string {
+	return fmt.Sprintf("%s@email.com", RandomString(6))
+}
+
 func RandomMoney() int64 {
 	// For the max, took the highest net worth currently and rounded up to the next order of magnitude higher
 	return RandomInt(0, 1000000000000)
@@ -42,5 +47,5 @@ func RandomMoney() int64 {
 
 func RandomCurrency() string {
 	currencies := [4]string{"jakata", "USD", "CAD", "EUR"}
-	return currencies[RandomInt(0, int64(len(currencies)) - 1)]
+	return currencies[RandomInt(0, int64(len(currencies))-1)]
 }

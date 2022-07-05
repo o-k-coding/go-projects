@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"sort"
 	"testing"
 
@@ -11,20 +10,29 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createRandomNewAccount() CreateAccountParams {
+func createRandomNewAccount(owner string) CreateAccountParams {
 	return CreateAccountParams{
-		Owner:    util.RandomOwner(),
+		Owner:    owner,
 		Balance:  util.RandomMoney(),
 		Currency: util.RandomCurrency(),
 	}
 }
 
-func TestCreateAccount(t *testing.T) {
-	params := createRandomNewAccount()
+func createNewTestAccount(t *testing.T) Account {
+	user := createNewTestUser(t)
+	params := createRandomNewAccount(user.Username)
 
 	account, err := testQueries.CreateAccount(context.Background(), params)
 	require.NoError(t, err)
+	return account
+}
 
+func TestCreateAccount(t *testing.T) {
+	user := createNewTestUser(t)
+	params := createRandomNewAccount(user.Username)
+
+	account, err := testQueries.CreateAccount(context.Background(), params)
+	require.NoError(t, err)
 	require.NotEmpty(t, account)
 
 	require.Equal(t, params.Owner, account.Owner)
@@ -36,9 +44,8 @@ func TestCreateAccount(t *testing.T) {
 
 func TestGetAccount(t *testing.T) {
 	ctx := context.Background()
-	params := createRandomNewAccount()
-	account, err := testQueries.CreateAccount(ctx, params)
-	require.NoError(t, err, "error creating account to get")
+	account := createNewTestAccount(t)
+
 	fetchedAccount, err := testQueries.GetAccount(ctx, account.ID)
 	require.NoError(t, err, "error getting new account")
 	require.NotEmpty(t, fetchedAccount, "fetched account is empty")
@@ -47,10 +54,9 @@ func TestGetAccount(t *testing.T) {
 
 func TestDeleteAccount(t *testing.T) {
 	ctx := context.Background()
-	params := createRandomNewAccount()
-	account, err := testQueries.CreateAccount(ctx, params)
-	require.NoError(t, err, "error creating account to delete")
-	err = testQueries.DeleteAccount(ctx, account.ID)
+	account := createNewTestAccount(t)
+
+	err := testQueries.DeleteAccount(ctx, account.ID)
 	require.NoError(t, err, "error deleting account")
 	account, err = testQueries.GetAccount(ctx, account.ID)
 	require.EqualError(t, err, sql.ErrNoRows.Error(), "wrong error getting deleted account")
@@ -59,9 +65,7 @@ func TestDeleteAccount(t *testing.T) {
 
 func TestUpdateAccountBalance(t *testing.T) {
 	ctx := context.Background()
-	params := createRandomNewAccount()
-	account, err := testQueries.CreateAccount(ctx, params)
-	require.NoError(t, err, "error creating account to get")
+	account := createNewTestAccount(t)
 
 	updateParams := UpdateAccountBalanceParams{
 		ID:      account.ID,
@@ -80,11 +84,7 @@ func TestListAccounts(t *testing.T) {
 
 	// Just to ensure there are least 6 entries in the DB to work with.
 	for i := 0; i < 6; i++ {
-		account := createRandomNewAccount()
-		_, err := testQueries.CreateAccount(ctx, account)
-		if err != nil {
-			fmt.Println("Error creating random new account", err)
-		}
+		createNewTestAccount(t)
 	}
 
 	params := ListAccountsParams{
