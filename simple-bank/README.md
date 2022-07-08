@@ -168,3 +168,59 @@ output file (so it won't write to stdout)
 ```sh
 mockgen -package mockdb -destination db/mock/store.go github.com/okeefem2/simple_bank/db/sqlc Store
 ```
+
+## JWT vs Paseto
+
+problems with jwt?
+"foot guns"
+
+devs have the option of picking weak algorithms because there are so many options.
+forgery is easy if you do not implement jwts properly (example the issue where setting header algorithm to none bypasses signature checking in some libraries)
+
+also setting the header to a symmetric alg when you know (via the public key) that the server is using an asymmetric alg.
+then sign with the public key.
+the server will use the public key, but the header will tell the server to use the symmetric alg instead (I feel like this is an implementation fault) and authentication will pass.
+implementation needs to verify the alg header to match what the server uses.
+
+in short, if you use jwts you probably shouldn't roll your own, but use a well knowm implementation (auth0 😉)
+
+### PASETO
+
+devs do not need to choose alg, just the version of paseto to use.
+only 2 most recent versions are accepted.
+
+paseto encrypts and authenticates all data in the token with a secret key when using a symmetric key.
+
+public or asymmetric key uses the same signature method as JWT.
+
+for both cases only 1 alg is used though per case.
+
+everything in token us authenticated using the same method as tls, so cannot be tampered with.
+
+simple to implement
+
+### token anatomy
+
+Local
+version of paseto
+purpose (local) which tells what type of key and signing to use
+
+- local symmetric and authenticated encryption
+payload (encrypted aka hex-encoded)\
+- data
+- nonce
+- authentication tag
+footer (optional)
+- encoded extra data
+
+public
+version of paseto
+purpose (local) which tells what type of key and signing to use
+
+- asymmetric and digital synature
+payload (encoded aka base64)\
+- data
+signature (encrypted - hex encoded)
+- used by server to authenticate authenticity
+footer (optional)
+- encoded extra data
