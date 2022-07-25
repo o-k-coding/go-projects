@@ -20,7 +20,10 @@ func main() {
 	}
 	conn := db.ConnectPostgres(config)
 	store := db.NewStore(conn)
-	server := api.NewServer(store)
+	server, err := api.NewServer(store, *config)
+	if err != nil {
+		log.Fatal("cannot create server", err)
+	}
 
 	err = server.Start("0.0.0.0:8080")
 	if err != nil {

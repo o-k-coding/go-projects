@@ -18,6 +18,22 @@ curl -X POST http://localhost:8080/users \
 curl -X POST http://localhost:8080/users \
   --data '{ "username": "kruppe", "fullName": "Kruppe", "email": "kruppe@email.com", "password": "phoenix" }'
 
+###### Valid Login
+
+curl -X POST http://localhost:8080/users/login \
+  --data '{ "username": "crokus_younghand", "password": "phoenixinn1" }'
+
+
+###### Invalid Login - wrong password
+
+curl -X POST http://localhost:8080/users/login \
+  --data '{ "username": "crokus_younghand", "password": "phoenixinn2" }'
+
+###### Invalid Login - user does not exist
+
+curl -X POST http://localhost:8080/users/login \
+  --data '{ "username": "crokus_lefthand", "password": "phoenixinn1" }'
+
 ###### Valid Create Account 1
 curl -X POST http://localhost:8080/accounts \
   --data '{ "owner": "crokus_younghand", "currency": "jakatas" }'

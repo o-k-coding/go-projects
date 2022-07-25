@@ -1,16 +1,20 @@
 package config
 
 import (
+	"time"
+
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	PostgresHost     string `mapstructure:"POSTGRES_HOST"`
-	PostgresUser     string `mapstructure:"POSTGRES_USER"`
-	PostgresPassword string `mapstructure:"POSTGRES_PASSWORD"`
-	PostgresDB       string `mapstructure:"POSTGRES_DB"`
-	PostgresPort     string `mapstructure:"POSTGRES_PORT"`
-	PostgresSSLMode  string `mapstructure:"POSTGRES_SSL_MODE"`
+	PostgresHost        string        `mapstructure:"POSTGRES_HOST"`
+	PostgresUser        string        `mapstructure:"POSTGRES_USER"`
+	PostgresPassword    string        `mapstructure:"POSTGRES_PASSWORD"`
+	PostgresDB          string        `mapstructure:"POSTGRES_DB"`
+	PostgresPort        string        `mapstructure:"POSTGRES_PORT"`
+	PostgresSSLMode     string        `mapstructure:"POSTGRES_SSL_MODE"`
+	TokenSymmetricKey   string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
+	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 }
 
 func LoadConfig(path string) (*Config, error) {

@@ -103,7 +103,7 @@ func TestGetAccountAPI(t *testing.T) {
 
 			tc.buildStubs(mockStore)
 
-			server := NewServer(mockStore)
+			server := newTestServer(t, mockStore)
 
 			// A recorder is the "official" way of testing http requests without having to manually make the call
 			// I wonder what is happening under the hood, if a real request is being made? we aren't actually calling start ourselves
