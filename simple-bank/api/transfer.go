@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	db "github.com/okeefem2/simple_bank/db/sqlc"
+	"github.com/okeefem2/simple_bank/token"
 )
 
 type transferRequest struct {
@@ -44,6 +45,25 @@ func (server *Server) createTransfer(ctx *gin.Context) {
 		Amount:        body.Amount,
 	}
 
+	fromAccount, err := server.validAccount(ctx, arg.FromAccountID, body.Currency)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+		} else if _, ok := err.(*InvalidCurrencyError); ok {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		} else {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		}
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
+	if fromAccount.Owner != authPayload.Username {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+	}
+
 	_, err = server.validAccount(ctx, arg.ToAccountID, body.Currency)
 
 	if err != nil {
@@ -78,15 +98,15 @@ func (e *InvalidCurrencyError) Error() string {
 	return fmt.Sprintf("account [%s] currency mismatch: %s vs %s", e.toAccountId.String(), e.accountCurrency, e.transferCurrency)
 }
 
-func (server *Server) validAccount(ctx *gin.Context, toAccountId uuid.UUID, currency string) (bool, error) {
+func (server *Server) validAccount(ctx *gin.Context, toAccountId uuid.UUID, currency string) (*db.Account, error) {
 	account, err := server.store.GetAccount(ctx, toAccountId)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	if account.Currency != currency {
-		return false, &InvalidCurrencyError{account.ID, account.Currency, currency}
+		return nil, &InvalidCurrencyError{account.ID, account.Currency, currency}
 	}
 
-	return true, nil
+	return &account, nil
 }

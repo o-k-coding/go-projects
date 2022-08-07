@@ -7,10 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	db "github.com/okeefem2/simple_bank/db/sqlc"
+	"github.com/okeefem2/simple_bank/token"
 )
 
 type createAccountRequest struct {
-	Owner string `json:"owner" binding:"required"`
+	// Owner string `json:"owner" binding:"required"`
 	// The oneof binding is definitely not very dynamic, would be interested if there are other options with gin
 	// probably better to validate ourselves for anything more complex.
 	Currency string `json:"currency" binding:"required,currency"`
@@ -24,9 +25,9 @@ func (server *Server) createAccount(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	arg := db.CreateAccountParams{
-		Owner:    body.Owner,
+		Owner:    authPayload.Username,
 		Currency: body.Currency,
 		Balance:  0,
 	}
@@ -69,6 +70,11 @@ func (server *Server) getAccount(ctx *gin.Context) {
 		}
 		return
 	}
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
+	if account.Owner != authPayload.Username {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+	}
 
 	ctx.JSON(http.StatusOK, account)
 }
@@ -99,7 +105,10 @@ func (server *Server) listAccounts(ctx *gin.Context) {
 	// I am leaving this in as an example for me though
 	req = setListPageDefaults(req)
 
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
 	listParams := db.ListAccountsParams{
+		Owner:  authPayload.Username,
 		Limit:  req.PageSize,
 		Offset: calculatePageOffset(req.PageSize, req.Page),
 	}

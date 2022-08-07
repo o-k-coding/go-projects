@@ -81,20 +81,23 @@ func TestUpdateAccountBalance(t *testing.T) {
 
 func TestListAccounts(t *testing.T) {
 	ctx := context.Background()
+	var lastAccount Account
 
 	// Just to ensure there are least 6 entries in the DB to work with.
 	for i := 0; i < 6; i++ {
-		createNewTestAccount(t)
+		lastAccount = createNewTestAccount(t)
 	}
 
 	params := ListAccountsParams{
-		Offset: 1,
+		Owner:  lastAccount.Owner,
+		Offset: 0,
 		Limit:  5,
 	}
 
 	accounts, err := testQueries.ListAccounts(ctx, params)
 	require.NoError(t, err, "error listing accounts")
-	require.Len(t, accounts, 5, "incorrect number of accounts listed")
+	// require.Len(t, accounts, 5, "incorrect number of accounts listed")
+	require.NotEmpty(t, accounts)
 
 	// The accounts should be sorted by name
 	sortedAccounts := make([]Account, len(accounts))
@@ -106,7 +109,8 @@ func TestListAccounts(t *testing.T) {
 		return sortedAccounts[i].CreatedAt.Before(sortedAccounts[j].CreatedAt)
 	})
 
-	for i, account := range accounts {
-		require.Equal(t, sortedAccounts[i], account)
+	for _, account := range accounts {
+		require.NotEmpty(t, account)
+		require.Equal(t, lastAccount, account)
 	}
 }

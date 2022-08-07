@@ -1,3 +1,22 @@
+## TODO for some reason the rest client ui is not working for most of these
+## TODO most of these requests need the authorization header added
+
+###### Valid Login, this one is needed for most of the next requests, need the access token
+
+curl -X POST http://localhost:8080/users/login \
+  --data '{ "username": "crokus_younghand", "password": "phoenixinn1" }'
+
+
+###### Invalid Login - wrong password
+
+curl -X POST http://localhost:8080/users/login \
+  --data '{ "username": "crokus_younghand", "password": "phoenixinn2" }'
+
+###### Invalid Login - user does not exist
+
+curl -X POST http://localhost:8080/users/login \
+  --data '{ "username": "crokus_lefthand", "password": "phoenixinn1" }'
+
 ###### Valid Create User 1
 
 curl -X POST http://localhost:8080/users \
@@ -17,22 +36,6 @@ curl -X POST http://localhost:8080/users \
 
 curl -X POST http://localhost:8080/users \
   --data '{ "username": "kruppe", "fullName": "Kruppe", "email": "kruppe@email.com", "password": "phoenix" }'
-
-###### Valid Login
-
-curl -X POST http://localhost:8080/users/login \
-  --data '{ "username": "crokus_younghand", "password": "phoenixinn1" }'
-
-
-###### Invalid Login - wrong password
-
-curl -X POST http://localhost:8080/users/login \
-  --data '{ "username": "crokus_younghand", "password": "phoenixinn2" }'
-
-###### Invalid Login - user does not exist
-
-curl -X POST http://localhost:8080/users/login \
-  --data '{ "username": "crokus_lefthand", "password": "phoenixinn1" }'
 
 ###### Valid Create Account 1
 curl -X POST http://localhost:8080/accounts \
@@ -55,7 +58,7 @@ curl -X POST http://localhost:8080/accounts \
 --data '{ "owner": "", "currency": "jakatas" }'
 
 ###### Valid Get Account
-## Sub account id with an id from previous Valid Create request
+###### Sub account id with an id from previous Valid Create request
 curl "http://localhost:8080/accounts/5c8b2ef6-1b04-4486-9c6a-aba1e791e343"
 
 
@@ -67,7 +70,7 @@ curl "http://localhost:8080/accounts/5c8b2ef6-1b04-4486-9c6a-aba1e791e342"
 curl "http://localhost:8080/accounts"
 
 ###### Valid List Accounts - page 1
-curl "http://localhost:8080/accounts?page=1&pageSize=10"
+curl -H "Authorization: Bearer <access_token>" "http://localhost:8080/accounts?page=1&pageSize=10"
 
 ###### Valid List Accounts - empty page
 curl "http://localhost:8080/accounts?page=10000&pageSize=10"

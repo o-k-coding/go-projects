@@ -9,32 +9,36 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	mockdb "github.com/okeefem2/simple_bank/db/mock"
 	db "github.com/okeefem2/simple_bank/db/sqlc"
+	"github.com/okeefem2/simple_bank/token"
 	"github.com/okeefem2/simple_bank/util"
 	"github.com/stretchr/testify/require"
 )
 
-func createRandomNewAccount() db.Account {
+func createRandomNewAccount(owner string) db.Account {
 	return db.Account{
 		ID:       uuid.New(),
-		Owner:    util.RandomOwner(),
+		Owner:    owner,
 		Balance:  util.RandomMoney(),
 		Currency: util.RandomCurrency(),
 	}
 }
 
 func TestGetAccountAPI(t *testing.T) {
-	account := createRandomNewAccount()
+	user := createRandomNewUser()
+	account := createRandomNewAccount(user.Username)
 
 	testCases := []struct {
 		name          string
 		accountID     string
 		buildStubs    func(mockStore *mockdb.MockStore)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 	}{
 		{
 			name:      "OK",
@@ -48,6 +52,9 @@ func TestGetAccountAPI(t *testing.T) {
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
 				requireBodyMatchAccount(t, recorder.Body, account)
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
 			},
 		},
 
@@ -63,6 +70,9 @@ func TestGetAccountAPI(t *testing.T) {
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusNotFound, recorder.Code)
 			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
+			},
 		},
 
 		{
@@ -77,6 +87,9 @@ func TestGetAccountAPI(t *testing.T) {
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
+			},
 		},
 
 		{
@@ -90,6 +103,39 @@ func TestGetAccountAPI(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
+			},
+		},
+
+		{
+			name:      "Unauthorized",
+			accountID: account.ID.String(),
+			buildStubs: func(mockStore *mockdb.MockStore) {
+				//  build stubs
+				// This function is expect to get called 1 time with any context, and the account id from our new random account
+				// And the function should return the account passed and nil for the error
+				mockStore.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.ID)).Times(1).Return(account, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "unauthorized_user", time.Minute)
+			},
+		},
+
+		{
+			name:      "NoAuthorization",
+			accountID: account.ID.String(),
+			buildStubs: func(mockStore *mockdb.MockStore) {
+				mockStore.EXPECT().GetAccount(gomock.Any(), gomock.Eq(account.ID)).Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 			},
 		},
 	}
@@ -111,6 +157,8 @@ func TestGetAccountAPI(t *testing.T) {
 			url := fmt.Sprintf("/accounts/%s", tc.accountID)
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
+
+			tc.setupAuth(t, request, server.tokenMaker)
 
 			server.router.ServeHTTP(recorder, request)
 
