@@ -1,12 +1,7 @@
 name: simple-bank-cd-image-build
 
-# on:
-#   push:
-#     branches: ["main"]
-#     paths: ["simple-bank/**"]
-
 on:
-  pull_request:
+  push:
     branches: ["main"]
     paths: ["simple-bank/**"]
 
