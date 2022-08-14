@@ -67,4 +67,6 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_SSL_MODE: ${{ secrets.POSTGRES_SSL_MODE }}
           POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+          TOKEN_SYMMETRIC_KEY: $ {{ secrets.TOKEN_SYMMETRIC_KEY }}
+          ACCESS_TOKEN_DURATION: $ {{ secrets.ACCESS_TOKEN_DURATION }}
         run: make test
