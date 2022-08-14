@@ -32,8 +32,9 @@ func LoadConfig(path string) (*Config, error) {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			// Attempt to read from env variables
 			log.Println(".env file not found, hopefully you set the env variables!")
+		} else {
+			return nil, err
 		}
-		return nil, err
 	}
 
 	var config Config
