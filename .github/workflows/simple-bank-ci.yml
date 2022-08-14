@@ -6,13 +6,14 @@ on:
     paths: ["simple-bank/**"]
 
 env:
-  POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-  POSTGRES_SSL_MODE: "disable"
-  POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
-  TOKEN_SYMMETRIC_KEY: ${{ secrets.TOKEN_SYMMETRIC_KEY }}
-  ACCESS_TOKEN_DURATION: ${{ secrets.ACCESS_TOKEN_DURATION }}
+  POSTGRES_HOST: localhost
+  POSTGRES_PASSWORD: password
+  POSTGRES_USER: simple-bank-user
+  POSTGRES_DB: simple-bank
+  POSTGRES_PORT: 5432
+  POSTGRES_SSL_MODE: disable
+  TOKEN_SYMMETRIC_KEY: 2de20579ee950645017b3afbe6a047e7
+  ACCESS_TOKEN_DURATION: 15m
 
 jobs:
   test:
@@ -25,13 +26,6 @@ jobs:
       postgres:
         # Docker Hub image
         image: postgres
-        # Provide the password for postgres
-        env:
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_SSL_MODE: ${{ secrets.POSTGRES_SSL_MODE }}
-          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
         ports:
           - 5432:5432
         # Set health checks to wait until postgres has started
@@ -66,16 +60,9 @@ jobs:
 
       - name: Migrate
         working-directory: ./simple-bank
-        run: migrate -path db/migrations -database "postgresql://${{ secrets.POSTGRES_USER }}:${{secrets.POSTGRES_PASSWORD}}@${{ secrets.POSTGRES_HOST }}:${{ secrets.POSTGRES_PORT }}/${{ secrets.POSTGRES_DB }}?sslmode=disable" -verbose up
+        run: migrate -path db/migrations -database "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB?sslmode=disable" -verbose up
 
       - name: Test
         working-directory: ./simple-bank
         run: |
-          POSTGRES_DB=$POSTGRES_DB
-          POSTGRES_USER=$POSTGRES_USER
-          POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-          POSTGRES_SSL_MODE="disable"
-          POSTGRES_PORT=$POSTGRES_PORT
-          TOKEN_SYMMETRIC_KEY=$TOKEN_SYMMETRIC_KEY
-          ACCESS_TOKEN_DURATION=$ACCESS_TOKEN_DURATION
           go test -v -cover ./...
