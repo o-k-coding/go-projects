@@ -26,6 +26,13 @@ jobs:
       postgres:
         # Docker Hub image
         image: postgres
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: simple-bank-user
+          POSTGRES_DB: simple-bank
+          POSTGRES_PORT: 5432
+          POSTGRES_SSL_MODE: disable
         ports:
           - 5432:5432
         # Set health checks to wait until postgres has started
@@ -64,5 +71,14 @@ jobs:
 
       - name: Test
         working-directory: ./simple-bank
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: simple-bank-user
+          POSTGRES_DB: simple-bank
+          POSTGRES_PORT: 5432
+          POSTGRES_SSL_MODE: disable
+          TOKEN_SYMMETRIC_KEY: 2de20579ee950645017b3afbe6a047e7
+          ACCESS_TOKEN_DURATION: 15m
         run: |
           go test -v -cover ./...
