@@ -13,7 +13,7 @@ FROM alpine
 WORKDIR /app
 
 COPY --from=builder /app/main .
-COPY .env.docker ./.env
+# COPY .env.docker ./.env in prod, expecting env variables to be set.
 
 EXPOSE 8080
 

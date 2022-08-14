@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"time"
 
 	"github.com/spf13/viper"
@@ -23,11 +24,15 @@ func LoadConfig(path string) (*Config, error) {
 	viper.SetConfigName(".env")
 	viper.SetConfigType("env")
 
+	err := viper.ReadInConfig()
 	// If the env variables exist in the env, they will overwrite the file values
 	viper.AutomaticEnv()
-	err := viper.ReadInConfig()
 
 	if err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			// Attempt to read from env variables
+			log.Println(".env file not found, hopefully you set the env variables!")
+		}
 		return nil, err
 	}
 
