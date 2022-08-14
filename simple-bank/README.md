@@ -7,7 +7,7 @@ Created following <https://www.udemy.com/course/backend-master-class-golang-post
 ### ECR
 
 Action used <https://github.com/marketplace/actions/amazon-ecr-login-action-for-github-actions>
-To create a role for GH actions CD, I used <https://grrr.tech/posts/2021/github-actions-assume-role/>
+To create a role for GH actions CD, I used <https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services>
 to help me.
 
 ## Building the docker image

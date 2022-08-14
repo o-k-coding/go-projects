@@ -10,6 +10,10 @@ on:
     branches: ["main"]
     paths: ["simple-bank/**"]
 
+permissions:
+  id-token: write
+  contents: read    # This is required for actions/checkout
+
 jobs:
   build:
     name: build image
@@ -20,7 +24,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v1
       with:
         role-to-assume: arn:aws:iam::105745650186:role/simplebank-gh-actions-cd-role
-        aws-region: us-east-1
+        aws-region: us-east-2
 
     - name: Login to Amazon ECR
       id: login-ecr
