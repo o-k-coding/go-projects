@@ -5,6 +5,15 @@ on:
     branches: ["main"]
     paths: ["simple-bank/**"]
 
+env:
+  POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+  POSTGRES_SSL_MODE: "disable"
+  POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+  TOKEN_SYMMETRIC_KEY: ${{ secrets.TOKEN_SYMMETRIC_KEY }}
+  ACCESS_TOKEN_DURATION: ${{ secrets.ACCESS_TOKEN_DURATION }}
+
 jobs:
   test:
     name: test
@@ -61,14 +70,6 @@ jobs:
 
       - name: Test
         working-directory: ./simple-bank
-        env:
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_SSL_MODE: "disable"
-          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
-          TOKEN_SYMMETRIC_KEY: ${{ secrets.TOKEN_SYMMETRIC_KEY }}
-          ACCESS_TOKEN_DURATION: ${{ secrets.ACCESS_TOKEN_DURATION }}
         run: |
           POSTGRES_DB=$POSTGRES_DB
           POSTGRES_USER=$POSTGRES_USER
