@@ -2,6 +2,12 @@
 
 Created following <https://www.udemy.com/course/backend-master-class-golang-postgresql-kubernetes/>
 
+## Test without env var
+
+```bash
+
+```
+
 ## AWS
 
 ### ECR

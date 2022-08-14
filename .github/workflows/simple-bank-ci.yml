@@ -77,4 +77,4 @@ jobs:
           POSTGRES_PORT=$POSTGRES_PORT
           TOKEN_SYMMETRIC_KEY=$TOKEN_SYMMETRIC_KEY
           ACCESS_TOKEN_DURATION=$ACCESS_TOKEN_DURATION
-          make test
+          go test -v -cover ./...
