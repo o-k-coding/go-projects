@@ -25,6 +25,7 @@ jobs:
     - name: Login to Amazon ECR Private
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
+
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
@@ -38,4 +39,3 @@ jobs:
       run: |
         docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
         docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
-      - uses: actions/checkout@v3
