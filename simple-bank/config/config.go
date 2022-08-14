@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"time"
 
 	"github.com/spf13/viper"
@@ -19,27 +18,27 @@ type Config struct {
 }
 
 func LoadConfig(path string) (*Config, error) {
-	viper.AddConfigPath(path)
+	// viper.AddConfigPath(path)
 	// This is how you would specify the name of the config file, ex app.env
-	viper.SetConfigName(".env")
-	viper.SetConfigType("env")
+	// viper.SetConfigName(".env")
+	// viper.SetConfigType("env")
 
-	err := viper.ReadInConfig()
+	// err := viper.ReadInConfig()
 	// If the env variables exist in the env, they will overwrite the file values
 	viper.AutomaticEnv()
 
-	if err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			// Attempt to read from env variables
-			log.Println(".env file not found, hopefully you set the env variables!")
-		} else {
-			return nil, err
-		}
-	}
+	// if err != nil {
+	// 	if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+	// 		// Attempt to read from env variables
+	// 		log.Println(".env file not found, hopefully you set the env variables!")
+	// 	} else {
+	// 		return nil, err
+	// 	}
+	// }
 
 	var config Config
 
-	err = viper.Unmarshal(&config)
+	err := viper.Unmarshal(&config)
 	if err != nil {
 		return nil, err
 	}
