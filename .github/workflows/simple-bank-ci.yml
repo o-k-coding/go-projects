@@ -57,7 +57,7 @@ jobs:
 
       - name: Migrate
         working-directory: ./simple-bank
-        run: migrate -path db/migrations -database "postgresql://${{ secrets.POSTGRES_USER }}:${{secrets.POSTGRES_PASSWORD}}@${{ secrets.POSTGRES_HOST }}:${{ secrets.POSTGRES_PORT }}/${{ secrets.POSTGRES_DB }}?sslmode=${{ secrets.POSTGRES_SSL_MODE }}" -verbose up
+        run: migrate -path db/migrations -database "postgresql://${{ secrets.POSTGRES_USER }}:${{secrets.POSTGRES_PASSWORD}}@${{ secrets.POSTGRES_HOST }}:${{ secrets.POSTGRES_PORT }}/${{ secrets.POSTGRES_DB }}?sslmode=disable" -verbose up
 
       - name: Test
         working-directory: ./simple-bank
@@ -65,7 +65,7 @@ jobs:
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_SSL_MODE: ${{ secrets.POSTGRES_SSL_MODE }}
+          POSTGRES_SSL_MODE: "disable"
           POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
           TOKEN_SYMMETRIC_KEY: $ {{ secrets.TOKEN_SYMMETRIC_KEY }}
           ACCESS_TOKEN_DURATION: $ {{ secrets.ACCESS_TOKEN_DURATION }}
