@@ -19,6 +19,7 @@ type Config struct {
 	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 }
 
+// Note, these are necessary for the struct marshalling to pick up env variables in the case that the config file does not exist
 func setEnvDefaults() {
 	viper.SetDefault("POSTGRES_HOST", "localhost")
 	viper.SetDefault("POSTGRES_USER", "postgres")
