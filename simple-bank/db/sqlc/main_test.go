@@ -14,6 +14,7 @@ var testQueries *Queries
 var testDB *sql.DB
 
 func TestMain(m *testing.M) {
+	// TODO should test if no config file as well
 	config, err := config.LoadConfig("../..")
 	if err != nil {
 		log.Fatal("cannot load config", err)

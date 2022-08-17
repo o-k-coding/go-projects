@@ -20,9 +20,10 @@ FOR NO KEY UPDATE; -- NO KEY UPDATE tells pg that the PK column won't be changin
 
 -- name: ListAccounts :many
 SELECT * FROM accounts
+WHERE owner = $1
 ORDER BY created_at
-LIMIT $1
-OFFSET $2;
+LIMIT $2
+OFFSET $3;
 
 -- name: DeleteAccount :exec
 DELETE FROM accounts

@@ -2,6 +2,43 @@
 
 Created following <https://www.udemy.com/course/backend-master-class-golang-postgresql-kubernetes/>
 
+## Test without env var
+
+```bash
+
+```
+
+## AWS
+
+### ECR
+
+Action used <https://github.com/marketplace/actions/amazon-ecr-login-action-for-github-actions>
+To create a role for GH actions CD, I used <https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services>
+to help me.
+
+## Building the docker image
+
+```bash
+docker build -t simplebank:latest .
+```
+
+## Running the docker image
+
+```bash
+docker run --name simplebank -p 8080:8080 simplebank:latest
+# optional, add -e GIN_MODE=release
+```
+
+## Networking docker containers
+
+(when running outside of compose) containers cannot talk to each other using hostname on the default bridge by default.
+so they need to be connected to a network together.
+
+```bash
+docker network create simplebank-network
+docker network connect simplebank-network <container>
+```
+
 ## Development environment setup
 
 requires go, docker
