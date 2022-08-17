@@ -6,14 +6,14 @@ on:
     paths: ["simple-bank/**"]
 
 env:
-  POSTGRES_HOST: localhost
-  POSTGRES_PASSWORD: password
-  POSTGRES_USER: simple-bank-user
-  POSTGRES_DB: simple-bank
-  POSTGRES_PORT: 5432
-  POSTGRES_SSL_MODE: disable
-  TOKEN_SYMMETRIC_KEY: 2de20579ee950645017b3afbe6a047e7
-  ACCESS_TOKEN_DURATION: 15m
+  POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+  POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+  POSTGRES_SSL_MODE: ${{ secrets.POSTGRES_SSL_MODE }}
+  POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+  TOKEN_SYMMETRIC_KEY: ${{ secrets.TOKEN_SYMMETRIC_KEY }}
+  ACCESS_TOKEN_DURATION: ${{ secrets.ACCESS_TOKEN_DURATION }}
 
 jobs:
   test:
@@ -26,13 +26,13 @@ jobs:
       postgres:
         # Docker Hub image
         image: postgres
-        env:
-          POSTGRES_HOST: localhost
-          POSTGRES_PASSWORD: password
-          POSTGRES_USER: simple-bank-user
-          POSTGRES_DB: simple-bank
-          POSTGRES_PORT: 5432
-          POSTGRES_SSL_MODE: disable
+        # env:
+        #   POSTGRES_HOST: localhost
+        #   POSTGRES_PASSWORD: password
+        #   POSTGRES_USER: simple-bank-user
+        #   POSTGRES_DB: simple-bank
+        #   POSTGRES_PORT: 5432
+        #   POSTGRES_SSL_MODE: disable
         ports:
           - 5432:5432
         # Set health checks to wait until postgres has started
@@ -71,14 +71,5 @@ jobs:
 
       - name: Test
         working-directory: ./simple-bank
-        env:
-          POSTGRES_HOST: localhost
-          POSTGRES_PASSWORD: password
-          POSTGRES_USER: simple-bank-user
-          POSTGRES_DB: simple-bank
-          POSTGRES_PORT: 5432
-          POSTGRES_SSL_MODE: disable
-          TOKEN_SYMMETRIC_KEY: 2de20579ee950645017b3afbe6a047e7
-          ACCESS_TOKEN_DURATION: 15m
         run: |
-          go test -v -cover ./...
+          make test
