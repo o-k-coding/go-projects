@@ -28,7 +28,8 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Build .env
-      run: aws secretsmanager get-secret-value --secret-id simple_bank --query SecretString --output text | jq -r 'to_entries|map("\(.key)=\(.value)")|.[]' > app.env
+      working-directory: ./simple-bank
+      run: aws secretsmanager get-secret-value --secret-id simple_bank --query SecretString --output text | jq -r 'to_entries|map("\(.key)=\(.value)")|.[]' > .env
 
     - name: Build, tag, and push docker image to Amazon ECR
       working-directory: ./simple-bank
