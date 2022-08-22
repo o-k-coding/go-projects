@@ -68,7 +68,7 @@ aws ecr get-login-password | docker login --username AWS --password-stdin 105745
 copy the URI from the image <https://us-east-2.console.aws.amazon.com/ecr/repositories/private/105745650186/simplebank?region=us-east-2>
 
 ```bash
-docker pull 105745650186.dkr.ecr.us-east-2.amazonaws.com/simplebank:086342992e4e82fcc2007598fda3eb7bb67bd59c
+docker run -p 8080:8080 <image_uri>
 ```
 
 ## Building the docker image
@@ -80,7 +80,7 @@ docker build -t simplebank:latest .
 ## Running the docker image
 
 ```bash
-docker run --name simplebank -p 8080:8080 simplebank:latest
+docker run  --rm --network simple-bank_default --name simplebank -p 8080:8080 simplebank:latest
 # optional, add -e GIN_MODE=release
 ```
 
