@@ -21,7 +21,7 @@ WORKDIR /app
 
 COPY --from=builder /app/main .
 COPY --from=tools /tools/migrate /usr/bin/migrate
-COPY app.env ./.env
+COPY .env ./.env
 COPY start.sh .
 COPY db/migrations ./db/migrations
 
