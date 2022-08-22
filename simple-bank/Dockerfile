@@ -6,6 +6,9 @@ WORKDIR /app
 COPY . .
 
 RUN go build -o main main.go
+RUN apk add --no-cache make
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
 
 # Run Stage
 
@@ -13,8 +16,8 @@ FROM alpine
 WORKDIR /app
 
 COPY --from=builder /app/main .
-# COPY .env.docker ./.env in prod, expecting env variables to be set.
 
 EXPOSE 8080
 
 CMD [ "/app/main" ]
+ENTRYPOINT [ "/app/start.sh" ]
