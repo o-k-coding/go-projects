@@ -2,13 +2,54 @@
 
 Created following <https://www.udemy.com/course/backend-master-class-golang-postgresql-kubernetes/>
 
-## Test without env var
+## Generating a token
 
 ```bash
-
+openssl rand -hex 64 | head -c 32
 ```
 
 ## AWS
+
+### AWS cli
+
+configure:
+
+aws access key id/secret from gh ci user
+
+To get secrets
+
+```bash
+aws secretsmanager get-secret-value --secret-id simple_bank --query SecretString
+```
+
+and converting it to env file format using jq
+
+```bash
+## convert the json inso an array of objects representing key/value pairs
+aws secretsmanager get-secret-value --secret-id simple_bank --query SecretString --output text | jq 'to_entries'
+
+## Map the array from ^ into an array of just the values of the "key" properting
+aws secretsmanager get-secret-value --secret-id simple_bank --query SecretString --output text | jq 'to_entries|map(.key)'
+
+## to get the values
+aws secretsmanager get-secret-value --secret-id simple_bank --query SecretString --output text | jq 'to_entries|map(.value)'
+
+## Use string interpolation to create the format we want
+## basically the \ in a string is equivalent to ${} in js
+aws secretsmanager get-secret-value --secret-id simple_bank --query SecretString --output text | jq 'to_entries|map("\(.key)=\(.value)")'
+
+## Next write each item of the array out using the array iterator
+aws secretsmanager get-secret-value --secret-id simple_bank --query SecretString --output text | jq 'to_entries|map("\(.key)=\(.value)")|.[]'
+
+## next remove the quotes using raw flag
+aws secretsmanager get-secret-value --secret-id simple_bank --query SecretString --output text | jq -r 'to_entries|map("\(.key)=\(.value)")|.[]'
+
+## Next send to the .env file
+
+aws secretsmanager get-secret-value --secret-id simple_bank --query SecretString --output text | jq -r 'to_entries|map("\(.key)=\(.value)")|.[]' > .env
+```
+
+this required adding a policy for secrets manager to the user
 
 ### ECR
 
