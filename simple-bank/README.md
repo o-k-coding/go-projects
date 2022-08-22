@@ -57,6 +57,20 @@ Action used <https://github.com/marketplace/actions/amazon-ecr-login-action-for-
 To create a role for GH actions CD, I used <https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services>
 to help me.
 
+#### Testing an image
+
+First need to authenticate
+
+```bash
+aws ecr get-login-password | docker login --username AWS --password-stdin 105745650186.dkr.ecr.us-east-2.amazonaws.com
+```
+
+copy the URI from the image <https://us-east-2.console.aws.amazon.com/ecr/repositories/private/105745650186/simplebank?region=us-east-2>
+
+```bash
+docker pull 105745650186.dkr.ecr.us-east-2.amazonaws.com/simplebank:086342992e4e82fcc2007598fda3eb7bb67bd59c
+```
+
 ## Building the docker image
 
 ```bash
