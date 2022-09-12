@@ -1,5 +1,4 @@
-# Use postgres/example user/password credentials
-version: '3.1'
+version: '3.9'
 
 services:
   simple-bank-db:
@@ -16,7 +15,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  # This needs a dockerfile... but I think that's wasteful because the host machine will always have go installed already
   migrate:
     depends_on:
       simple-bank-db:
@@ -25,6 +23,19 @@ services:
       context: ./
       dockerfile: Dockerfile.migrate
     container_name: 'simple-bank-db-migrate'
+
+  simple-bank-api:
+    depends_on:
+      simple-bank-db:
+          condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+
 
 
 volumes:

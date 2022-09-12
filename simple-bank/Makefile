@@ -45,5 +45,6 @@ generate:
 		--openapiv2_out doc/swagger \
     --openapiv2_opt logtostderr=true,allow_merge=true,merge_file_name=simple_bank_docs \
     proto/*.proto
+	statik -src=./doc/swagger -dest=./doc
 
 .PHONY: server test mock schema docs generate

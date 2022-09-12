@@ -6,14 +6,19 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/golang/mock/mockgen/model"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/lib/pq"
 	"github.com/okeefem2/simple_bank/api"
 	"github.com/okeefem2/simple_bank/config"
 	db "github.com/okeefem2/simple_bank/db/sqlc"
+	_ "github.com/okeefem2/simple_bank/doc/statik"
 	"github.com/okeefem2/simple_bank/gapi"
 	"github.com/okeefem2/simple_bank/pb"
+	"github.com/rakyll/statik/fs"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -29,6 +34,14 @@ func main() {
 	conn := db.ConnectPostgres(c)
 	store := db.NewStore(conn)
 
+	// run db migration
+	dbSource, err := db.BuildPostgresDBSource(c)
+	// lol this is annoying and not needed I think
+	if err != nil {
+		log.Fatal("cannot build db source", err)
+	}
+	runDBmigration(c.MigrationUrl, dbSource)
+
 	if c.ServerType == "http" {
 		runHttpServer(store, c)
 	} else if c.ServerType == "grpc" || c.ServerType == "gateway" {
@@ -43,6 +56,20 @@ func main() {
 	} else {
 		log.Fatalf("server type not supported: %s", c.ServerType)
 	}
+}
+
+func runDBmigration(migrationURL string, dbSource string) {
+	migration, err := migrate.New(
+		migrationURL,
+		dbSource)
+
+	if err != nil {
+		log.Fatal("cannot create migration", err)
+	}
+	if err := migration.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatal("cannot run migration", err)
+	}
+	log.Println("db migration complete")
 }
 
 func runHttpServer(store db.Store, conf *config.Config) {
@@ -96,6 +123,15 @@ func runGatewayServer(store db.Store, conf *config.Config) {
 
 	httpMux := http.NewServeMux()
 	httpMux.Handle("/", grpcMux)
+
+	// fileServer := http.FileServer(http.Dir("./doc/swagger")) // Method to directly serve from FS rather than embedding with statik
+	statikFs, err := fs.New()
+	if err != nil {
+		log.Fatal("cannot create statik fs", err)
+	}
+	fileServer := http.FileServer(statikFs)
+	swaggerHandler := http.StripPrefix("/docs/", fileServer)
+	httpMux.Handle("/docs/", swaggerHandler) // Use Strip Prefix to not mess up the routing in the swagger UI code (which I think is React)
 
 	listener, err := net.Listen("tcp", "0.0.0.0:8080")
 	if err != nil {

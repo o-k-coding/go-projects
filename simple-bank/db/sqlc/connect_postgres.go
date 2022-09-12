@@ -12,7 +12,7 @@ const (
 )
 
 func ConnectPostgres(config *config.Config) *sql.DB {
-	dbSource, err := buildPostgresDBSource(config)
+	dbSource, err := BuildPostgresDBSource(config)
 	if err != nil {
 		log.Fatal("error building db source string for tests", err)
 	}

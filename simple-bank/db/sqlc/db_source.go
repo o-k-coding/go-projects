@@ -8,7 +8,7 @@ import (
 
 // Another approach would be to contain this in the env file itself lol.
 // But at least this way, there are more fine grained controls?
-func buildPostgresDBSource(config *config.Config) (string, error) {
+func BuildPostgresDBSource(config *config.Config) (string, error) {
 	user := config.PostgresUser
 	password := config.PostgresPassword
 	host := config.PostgresHost

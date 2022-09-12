@@ -404,7 +404,6 @@ I needed to configure the inbound rule for the rds security group.
 
 <https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#SecurityGroups:>
 
-
 running the nginx ingress controller for aws
 
 ```bash
@@ -420,6 +419,8 @@ dbdocs
 npm global cli tools. pretty neat!
 
 ## GPRC
+
+instructions for installing protoc for go <https://grpc.io/docs/languages/go/quickstart/>
 
 remote procedure call framework
 
@@ -465,7 +466,6 @@ cp /home/okeefem355/Dev/repos/third-party/googleapis/google/api/httpbody.proto .
 
 got some errors with protoc command, I ended up removing the brew installed version, and using apt-get (had to use sudo though because my env is jacked up I think)
 
-
 needed these files for openapi stuffs
 
 ```bash
@@ -478,3 +478,14 @@ To set up routing, my domain is handled by netlify, I had to add a cname record 
     a7e116e28080e4fa097945c3c60290c5-233bb7052b6ec35c.elb.us-east-2.amazonaws.com
 
 Did NOT need to set anything up in aws for dns
+
+## Serving Static files
+
+the course uses a library called Statik which bundles the files in the binary rather than serving them from some other location on disk.
+
+This is nice because everything will be loaded in memory (fast). But tradeoff is memory usage, best to use small static files, and I am not sure how well this scales for a lot of traffic - would this increase memory usage a lot.
+
+Also check this out.
+<https://dev.to/koddr/the-easiest-way-to-embed-static-files-into-a-binary-file-in-your-golang-app-no-external-dependencies-43pc>
+
+I would be really curious to try this with a react app or something, and load test it.

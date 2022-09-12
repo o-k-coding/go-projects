@@ -10,6 +10,7 @@ import (
 
 type Config struct {
 	ServerType           string        `mapstructure:"SERVER_TYPE"` //.http grpc or gateway
+	MigrationUrl         string        `mapstructure:"MIGRATION_URL"`
 	PostgresHost         string        `mapstructure:"POSTGRES_HOST"`
 	PostgresUser         string        `mapstructure:"POSTGRES_USER"`
 	PostgresPassword     string        `mapstructure:"POSTGRES_PASSWORD"`
@@ -24,6 +25,7 @@ type Config struct {
 // Note, these are necessary for the struct marshalling to pick up env variables in the case that the config file does not exist
 func setEnvDefaults() {
 	viper.SetDefault("SERVER_TYPE", "gateway")
+	viper.SetDefault("MIGRATION_URL", "file://db/migrations")
 	viper.SetDefault("POSTGRES_HOST", "localhost")
 	viper.SetDefault("POSTGRES_USER", "postgres")
 	viper.SetDefault("POSTGRES_PASSWORD", "")
