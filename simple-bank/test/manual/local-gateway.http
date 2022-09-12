@@ -1,0 +1,7 @@
+curl -X POST http://localhost:8080/v1/login_user \
+  --data '{ "username": "crokus_lefthand", "password": "phoenixinn1" }'
+
+###### Valid Login, this one is needed for most of the next requests, need the access token
+
+curl -X POST http://localhost:8080/v1/login_user  \
+  --data '{ "username": "crokus_younghand", "password": "phoenixinn1" }'

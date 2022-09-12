@@ -1,0 +1,10 @@
+###### Valid Login, this one is needed for most of the next requests, need the access token
+
+curl -X POST http://a7e116e28080e4fa097945c3c60290c5-233bb7052b6ec35c.elb.us-east-2.amazonaws.com/users/login \
+  --data '{ "username": "crokus_younghand", "password": "phoenixinn1" }'
+
+
+#####
+
+curl -X POST api.okscoring.com/users/login \
+  --data '{ "username": "crokus_younghand", "password": "phoenixinn1" }'

@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package pb;
+
+import "user.proto";
+
+option go_package = "github.com/okeefem2/simple_bank/pb";
+
+message CreateUserRequest {
+  // Numbers 1-15 take only 1 byte to encode
+  // larger numbers require >= 2 bytes
+  string username = 1;
+  string full_name = 2;
+  string email = 3;
+  string password = 4;
+}
+
+message CreateUserResponse {
+  // Numbers 1-15 take only 1 byte to encode
+  // larger numbers require >= 2 bytes
+  User user = 1;
+}

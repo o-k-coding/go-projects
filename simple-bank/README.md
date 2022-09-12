@@ -10,11 +10,16 @@ openssl rand -hex 64 | head -c 32
 
 ## AWS
 
-### AWS cli
-
-configure:
+configuring cli:
 
 aws access key id/secret from gh ci user
+
+### Secrets
+
+Remember that currently secrets are pulled from aws during the image creation and baked into the image. So if you change a secret, a new image needs to be created.
+This is not ideal, I am assuming later in the course we will change it.
+
+#### AWS cli
 
 To get secrets
 
@@ -57,7 +62,7 @@ Action used <https://github.com/marketplace/actions/amazon-ecr-login-action-for-
 To create a role for GH actions CD, I used <https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services>
 to help me.
 
-#### Testing an image
+#### Testing an image from ECR
 
 First need to authenticate
 
@@ -71,13 +76,13 @@ copy the URI from the image <https://us-east-2.console.aws.amazon.com/ecr/reposi
 docker run -p 8080:8080 <image_uri>
 ```
 
-## Building the docker image
+## Building the docker image (local)
 
 ```bash
 docker build -t simplebank:latest .
 ```
 
-## Running the docker image
+## Running the docker image (local)
 
 ```bash
 docker run  --rm --network simple-bank_default --name simplebank -p 8080:8080 simplebank:latest
@@ -316,3 +321,160 @@ signature (encrypted - hex encoded)
 - used by server to authenticate authenticity
 footer (optional)
 - encoded extra data
+
+## Kubernetes
+
+Worker nodes (machines) that run the containers
+in each node is a kubelet agent that orchestrates pods running the containers
+
+Container runtimes supported are Docker, containerd and CRI-O
+Kubeproxy: maintain network rules, allows communication between pods
+
+### Control plane
+
+runs on the master node and manages worker nods and pods in the cluster.
+also contains the API server managing the kubernetes API.
+contains etcd, a persistent store for cluster data
+
+#### API Server
+
+Contains the following
+
+connection with etcd, a persistent store for cluster data
+
+scheduler (watches for new pods with no node, selects a node to run on)
+
+controller manager
+  node controller - to handle when nodes go down
+  job controller - to watch for jobs/tasks and creates pods for them
+  endpoint controller - populates endpoints object to join services (?)
+  service account & token controller - creates default account and access tokens for new namespace for the kubernetes api
+
+cloud controller manager - links the cluster in the cloud platform API (what makes kubernetes cloud agnostic)
+  node controller - checking cloud provider to determine if non responding nodes have been deleted or not.
+  route controller - setting up routes in the cloud ifx
+  service controller - CRUD cloud load balancers
+
+All of the worker nodes communicate with the API server for orchestration
+
+### Kubectl
+
+to get the eks cluster info into local config
+
+```bash
+aws eks update-kubeconfig --name simple-bank --region us-east-2
+```
+
+error
+
+```bash
+kubectl cluster-info
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+error: You must be logged in to the server (Unauthorized)
+```
+
+RBAC configuration not allowing your IAM entity to access the cluster.
+Initally only the creator of the cluster has permissions to configure the cluster.
+
+basically you need to be authenticated as the user you created the cluster with (in my case, my console login user). or add perms to the other user you want to use.
+
+The solution is:
+
+```bash
+aws sts get-caller-identity # using github-ci user, which is not configured with the master creds
+cat ~/.aws/credentials # github-ci user creds
+
+```
+
+create a new access key for your account in the console.
+add it to .aws/credentials
+
+to use the github profile
+
+```bash
+export AWS_PROFILE=github
+```
+
+more info <https://aws.amazon.com/premiumsupport/knowledge-center/amazon-eks-cluster-access/>
+
+When starting the service in kubernetes, I was getting a timeout error connecting to postgres
+
+I needed to configure the inbound rule for the rds security group.
+
+<https://us-east-2.console.aws.amazon.com/ec2/v2/home?region=us-east-2#SecurityGroups:>
+
+
+running the nginx ingress controller for aws
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/aws/deploy.yaml
+```
+
+kubectl exec -it -n ingress-nginx ingress-nginx-controller-54d587fbc6-nchxg -- cat /etc/nginx/nginx.conf
+
+## DB docs
+
+dbml2sql
+dbdocs
+npm global cli tools. pretty neat!
+
+## GPRC
+
+remote procedure call framework
+
+client can execute a function (procedure) on a server
+protocol buffer handles the data structures of the calls. (request and response structure)
+
+1. define api & data structure (protobuf)
+2. generate gRPC stub code
+3. implement the server code
+4. implement the client code
+5. profit
+
+types
+
+- unary - single request/response
+- client streaming - client streams message and gets 1 response
+- server streaming - client sends 1 request and server streams messages in response
+- bidirectional - client and server stream to each other.
+
+### grpc gateway
+
+a protobug plugin that adds functionality for http json api as well
+from proto file, you can generate grpc and json http code.
+
+basically the client calls the gateway with http, then the gateway makes an rpc call from there
+
+in process translation gateway calls grpc code directly (unary only), this does not require an extra network hop
+
+separate proxy server - translated and forwarded to grpc via network call (unary and streaming)
+
+followed instructions in <https://github.com/grpc-ecosystem/grpc-gateway> for installation.
+
+Needed to clone the repo <https://github.com/googleapis/googleapis>
+
+and copy over the following files
+
+```sh
+cp /home/okeefem355/Dev/repos/third-party/googleapis/google/api/annotations.proto ./proto/google/
+cp /home/okeefem355/Dev/repos/third-party/googleapis/google/api/field_behavior.proto ./proto/google/
+cp /home/okeefem355/Dev/repos/third-party/googleapis/google/api/http.proto ./proto/google/
+cp /home/okeefem355/Dev/repos/third-party/googleapis/google/api/httpbody.proto ./proto/google/
+```
+
+got some errors with protoc command, I ended up removing the brew installed version, and using apt-get (had to use sudo though because my env is jacked up I think)
+
+
+needed these files for openapi stuffs
+
+```bash
+cp /home/okeefem355/Dev/repos/third-party/grpc-gateway/protoc-gen-openapiv2/options/*.proto ./proto/protoc-gen-openapiv2/options/
+```
+
+## DNS STUFF
+
+To set up routing, my domain is handled by netlify, I had to add a cname record that points to the nginx controller pod public IP
+    a7e116e28080e4fa097945c3c60290c5-233bb7052b6ec35c.elb.us-east-2.amazonaws.com
+
+Did NOT need to set anything up in aws for dns

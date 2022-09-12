@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: simple-bank-api-service
+spec:
+  selector:
+    app: simple-bank-api # from the deployment template
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  # type: LoadBalancer # exposes an external IP. use when no domain name is attached
+  type: ClusterIP # ClusterIP is used for only internal communication, with ingress mapping to it for external

@@ -9,18 +9,21 @@ import (
 )
 
 type Config struct {
-	PostgresHost        string        `mapstructure:"POSTGRES_HOST"`
-	PostgresUser        string        `mapstructure:"POSTGRES_USER"`
-	PostgresPassword    string        `mapstructure:"POSTGRES_PASSWORD"`
-	PostgresDB          string        `mapstructure:"POSTGRES_DB"`
-	PostgresPort        string        `mapstructure:"POSTGRES_PORT"`
-	PostgresSSLMode     string        `mapstructure:"POSTGRES_SSL_MODE"`
-	TokenSymmetricKey   string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
-	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	ServerType           string        `mapstructure:"SERVER_TYPE"` //.http grpc or gateway
+	PostgresHost         string        `mapstructure:"POSTGRES_HOST"`
+	PostgresUser         string        `mapstructure:"POSTGRES_USER"`
+	PostgresPassword     string        `mapstructure:"POSTGRES_PASSWORD"`
+	PostgresDB           string        `mapstructure:"POSTGRES_DB"`
+	PostgresPort         string        `mapstructure:"POSTGRES_PORT"`
+	PostgresSSLMode      string        `mapstructure:"POSTGRES_SSL_MODE"`
+	TokenSymmetricKey    string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
+	AccessTokenDuration  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	RefreshTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
 }
 
 // Note, these are necessary for the struct marshalling to pick up env variables in the case that the config file does not exist
 func setEnvDefaults() {
+	viper.SetDefault("SERVER_TYPE", "gateway")
 	viper.SetDefault("POSTGRES_HOST", "localhost")
 	viper.SetDefault("POSTGRES_USER", "postgres")
 	viper.SetDefault("POSTGRES_PASSWORD", "")
@@ -29,6 +32,7 @@ func setEnvDefaults() {
 	viper.SetDefault("POSTGRES_SSL_MODE", "disable")
 	viper.SetDefault("TOKEN_SYMMETRIC_KEY", "")
 	viper.SetDefault("ACCESS_TOKEN_DURATION", "10m")
+	viper.SetDefault("REFRESH_TOKEN_DURATION", "24h")
 }
 
 func LoadConfig(path string) (*Config, error) {

@@ -24,8 +24,8 @@ type userResponse struct {
 	Username          string    `json:"username"`
 	FullName          string    `json:"fullName"`
 	Email             string    `json:"email"`
-	CreatedAt         time.Time `json:"createdAt"`
 	PasswordChangedAt time.Time `json:"passwordChangedAt"`
+	CreatedAt         time.Time `json:"createdAt"`
 }
 
 // This is done in order to make sure sensitive data is not returned
@@ -79,8 +79,10 @@ type loginUserRequest struct {
 }
 
 type loginUserResponse struct {
-	AccessToken string `json:"accessToken"`
-	User        userResponse
+	SessionID    uuid.UUID `json:"sessionId"`
+	User         userResponse
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
 }
 
 func (server *Server) loginUser(ctx *gin.Context) {
@@ -111,9 +113,47 @@ func (server *Server) loginUser(ctx *gin.Context) {
 		return
 	}
 
+	refreshToken, err := server.tokenMaker.CreateToken(
+		user.Username,
+		server.config.RefreshTokenDuration,
+	)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	// In the course he added the payload as a return value of CreateToken, I am not going to because I am alittle lazy lol
+	// I can see the benefit. I also could see it being a problem adjusting an existing API, maybe a security concern.
+	// Unless this added significant performance issues, I would just leave it.
+	refreshPayload, err := server.tokenMaker.VerifyToken(refreshToken)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	session, err := server.store.CreateSession(ctx, db.CreateSessionParams{
+		ID:           refreshPayload.ID,
+		Username:     user.Username,
+		RefreshToken: refreshToken,
+		// These come from the gin context
+		UserAgent: ctx.Request.UserAgent(),
+		ClientIp:  ctx.ClientIP(),
+		IsBlocked: false,
+		ExpiresAt: refreshPayload.ExpiredAt,
+	})
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
 	rsp := loginUserResponse{
-		AccessToken: accessToken,
-		User:        newUserResponse(user),
+		SessionID:    session.ID,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		User:         newUserResponse(user),
 	}
 
 	ctx.JSON(http.StatusOK, rsp)

@@ -1,0 +1,36 @@
+# Note this does not work with nginx controller with no host :( <https://github.com/nginxinc/kubernetes-ingress/issues/209>
+
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: nginx
+spec:
+  controller: k8s.io/ingress-nginx
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: simple-bank-api-ingress
+  annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/default-backend: simple-bank-api-service
+      nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  defaultBackend:
+    service:
+      name: simple-bank-api-service
+      port:
+        number: 80
+
+  ingressClassName: nginx
+  rules:
+  - host: "*.okscoring.com"
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: simple-bank-api-service
+            port:
+              number: 80
