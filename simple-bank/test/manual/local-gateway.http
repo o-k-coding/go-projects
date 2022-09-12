@@ -1,7 +1,13 @@
-curl -X POST http://localhost:8080/v1/login_user \
-  --data '{ "username": "crokus_lefthand", "password": "phoenixinn1" }'
+curl -X POST http://localhost:8080/v1/create_user \
+  --data '{ "username": "crokus_lefthand", "password": "phoenixinn1", "email": "crokus.lefthand@email.com", "fullName": "Crokus Lefthand" }'
 
 ###### Valid Login, this one is needed for most of the next requests, need the access token
 
 curl -X POST http://localhost:8080/v1/login_user  \
-  --data '{ "username": "crokus_younghand", "password": "phoenixinn1" }'
+  --data '{ "username": "crokus_lefthand", "password": "phoenixinn2" }'
+
+
+###### Valid Login, this one is needed for most of the next requests, need the access token
+
+curl -X PATCH http://localhost:8080/v1/update_user  \
+  --data '{ "username": "crokus_lefthand", "password": "phoenixinn2" }'

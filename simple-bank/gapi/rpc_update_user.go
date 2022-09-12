@@ -69,7 +69,7 @@ func validateUpdateUserRequest(req *pb.UpdateUserRequest) (violations []*errdeta
 	}
 
 	if req.FullName != nil {
-		if err := validate.ValidateFullName(req.GetPassword()); err != nil {
+		if err := validate.ValidateFullName(req.GetFullName()); err != nil {
 			violations = append(violations, fieldViolation("fullName", err))
 		}
 	}
